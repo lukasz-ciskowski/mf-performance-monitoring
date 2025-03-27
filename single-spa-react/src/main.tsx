@@ -11,16 +11,18 @@ import { getWebInstrumentations, initializeFaro } from '@grafana/faro-react';
 import { TracingInstrumentation } from '@grafana/faro-web-tracing';
 
 initializeFaro({
-    // required: the URL of the Grafana collector
     url: 'http://localhost:8027/collect',
-
-    // required: the identification label of your application
     app: {
-        name: 'single_spa_react_2',
+        name: 'single_spa_react',
         version: '1.0.0',
         environment: 'production',
     },
     instrumentations: [...getWebInstrumentations(), new TracingInstrumentation()],
+    beforeSend: (event) => {
+        console.log('Sending event', event);
+        return event;
+    },
+    ignoreErrors: ['Unchecked runtime.lastError: The message port closed before a response was received.'],
 });
 
 createRoot(document.getElementById('root')!).render(

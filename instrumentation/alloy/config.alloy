@@ -29,15 +29,10 @@ logging {
     level = "info"
 }
 
-faro.receiver "single_spa_react" {
+faro.receiver "frontend" {
     extra_log_labels = {
-		kind = "",
-	}
-
-    external_labels = {
-        job = "faro",
         app_name = "",
-    }
+	}
 
     server {
         listen_address           = "0.0.0.0"

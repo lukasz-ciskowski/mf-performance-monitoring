@@ -9,7 +9,20 @@ services:
       - "10001:10001"
       - "/var/tempo"
     volumes:
-      - ./tempo/data:/var/tempo
+      - ./tmp/tempo/data:/var/tempo
+
+  tempo:
+    image: *tempoImage
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    volumes:
+      - ./instrumentation/tempo/tempo.yaml:/etc/tempo.yaml
+      - ./tmp/tempo/data:/var/tempo
+    ports:
+      - "3200:3200"
+    depends_on:
+      - init
+      - memcached
+
 
   memcached:
     image: memcached:1.6.29
@@ -20,22 +33,10 @@ services:
       - MEMCACHED_MAX_MEMORY=64m
       - MEMCACHED_THREADS=4
 
-  tempo:
-    image: *tempoImage
-    command: [ "-config.file=/etc/tempo.yaml" ]
-    volumes:
-      - ./tempo/tempo.yaml:/etc/tempo.yaml
-      - ./tempo/data:/var/tempo
-    ports:
-      - "3200:3200"
-    depends_on:
-      - init
-      - memcached
-
   prometheus:
     image: prom/prometheus:latest
     volumes:
-      - "./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"
+      - "./instrumentation/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"
     ports:
       - 9090:9090
 
@@ -50,7 +51,9 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./grafana/data:/var/lib/grafana
+      - ./tmp/grafana/data:/var/lib/grafana
+      - ./instrumentation/grafana/provisioning:/etc/grafana/provisioning
+      - ./instrumentation/grafana/dashboards:/var/lib/grafana/dashboards
     restart: unless-stopped
 
   alloy:
@@ -60,10 +63,21 @@ services:
       - "8027:8027"
       - "4317:4317"
     volumes:
-      - "./alloy/config.alloy:/etc/alloy/config.alloy"
+      - "./instrumentation/alloy/config.alloy:/etc/alloy/config.alloy"
     command: [
       "run",
       "--server.http.listen-addr=0.0.0.0:12345",
       "--stability.level=public-preview",
       "/etc/alloy/config.alloy",
     ]
+
+  frontend:
+    build:
+      context: ./single-spa-react
+      dockerfile: Dockerfile
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./single-spa-react:/app
+      - /app/node_modules
+    restart: unless-stopped

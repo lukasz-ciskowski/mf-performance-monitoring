@@ -11,4 +11,7 @@ export default defineConfig({
             treeshake: false,
         },
     },
+    server: {
+        port: 4000,
+    },
 });
