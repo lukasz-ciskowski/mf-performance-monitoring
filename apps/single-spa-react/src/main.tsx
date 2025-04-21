@@ -10,7 +10,7 @@ import App from './App.tsx';
 import { getWebInstrumentations, initializeFaro } from '@grafana/faro-react';
 import { TracingInstrumentation } from '@grafana/faro-web-tracing';
 
-initializeFaro({
+export const faro = initializeFaro({
     url: 'http://localhost:8027/collect',
     app: {
         name: 'single_spa_react',
@@ -21,6 +21,10 @@ initializeFaro({
     beforeSend: (event) => {
         console.log('Sending event', event);
         return event;
+    },
+    sessionTracking: {
+        enabled: true,
+        samplingRate: 1.0,
     },
     ignoreErrors: ['Unchecked runtime.lastError: The message port closed before a response was received.'],
 });

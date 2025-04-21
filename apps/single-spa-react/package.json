@@ -4,10 +4,10 @@
     "version": "0.0.0",
     "type": "module",
     "scripts": {
-        "dev": "vite",
+        "dev": "vite --host --port 4000",
         "build": "tsc -b && vite build",
         "lint": "eslint .",
-        "preview": "vite preview --port 4000"
+        "preview": "vite preview --port 4000 --host"
     },
     "dependencies": {
         "@emotion/react": "^11.14.0",
@@ -17,6 +17,7 @@
         "@grafana/faro-web-tracing": "^1.14.1",
         "@mui/icons-material": "^6.4.7",
         "@mui/material": "^6.4.7",
+        "antd": "^5.24.6",
         "react": "^19.0.0",
         "react-dom": "^19.0.0"
     },
@@ -33,5 +34,8 @@
         "typescript-eslint": "^8.24.1",
         "vite": "^6.2.0",
         "vite-bundle-analyzer": "^0.17.1"
+    },
+    "optionalDependencies": {
+        "@rollup/rollup-linux-arm64-gnu": "4.9.5"
     }
 }

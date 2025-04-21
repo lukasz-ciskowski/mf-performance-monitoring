@@ -14,8 +14,7 @@ RUN pnpm install
 # Copy source code
 COPY . .
 
-# Expose port 8080
-EXPOSE 8080
+EXPOSE 4000
 
 # Start the application
 CMD ["pnpm", "dev"]
