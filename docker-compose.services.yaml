@@ -46,6 +46,15 @@ services:
         - "8081:8081"
         depends_on:
         - mongo
+    db-service:
+        build:
+            context: ./services/db-service
+            dockerfile: Dockerfile
+        ports:
+        - "8083:8083"
+        depends_on:
+        - mongo-service
+        - postgres-service
 
 volumes:
   postgres_data: {}

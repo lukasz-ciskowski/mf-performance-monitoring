@@ -2,9 +2,12 @@ import express, { Express } from 'express';
 import './instrumentation';
 import { metrics, SpanStatusCode, trace } from '@opentelemetry/api';
 import { Db, MongoClient } from 'mongodb';
+import cors from 'cors';
 
 const PORT: number = parseInt(process.env.PORT || '8081');
 const app: Express = express();
+
+app.use(cors());
 
 const tracer = trace.getTracer('mongo-service');
 

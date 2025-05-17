@@ -9,8 +9,8 @@ cache:
     writeback_goroutines: 5
   caches:
   - roles:
-    - frontend-search  
-    memcached: 
+    - frontend-search
+    memcached:
       addresses: dns+memcached:11211
 
 query_frontend:
@@ -88,4 +88,3 @@ overrides:
     metrics_generator:
       processors: [service-graphs, span-metrics, local-blocks] # enables metrics generator
       generate_native_histograms: both
-      

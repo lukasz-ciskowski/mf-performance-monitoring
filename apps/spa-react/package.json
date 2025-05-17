@@ -1,0 +1,48 @@
+{
+    "name": "spa-react",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "vite --port 3001",
+        "start": "vite --port 3001",
+        "build": "vite build && tsc",
+        "serve": "vite preview",
+        "test": "vitest run",
+        "format": "biome format",
+        "lint": "biome lint",
+        "check": "biome check"
+    },
+    "dependencies": {
+        "@opentelemetry/api": "^1.9.0",
+        "@opentelemetry/auto-instrumentations-web": "^0.47.0",
+        "@opentelemetry/context-zone": "^2.0.1",
+        "@opentelemetry/core": "^2.0.1",
+        "@opentelemetry/exporter-trace-otlp-http": "^0.201.0",
+        "@opentelemetry/instrumentation": "^0.201.0",
+        "@opentelemetry/instrumentation-fetch": "^0.201.0",
+        "@opentelemetry/resources": "^2.0.1",
+        "@opentelemetry/sdk-trace-base": "^2.0.1",
+        "@opentelemetry/sdk-trace-web": "^2.0.1",
+        "@opentelemetry/semantic-conventions": "^1.33.0",
+        "@tailwindcss/vite": "^4.0.6",
+        "@tanstack/react-router": "^1.114.3",
+        "@tanstack/react-router-devtools": "^1.114.3",
+        "@tanstack/router-plugin": "^1.114.3",
+        "react": "^19.0.0",
+        "react-dom": "^19.0.0",
+        "tailwindcss": "^4.0.6"
+    },
+    "devDependencies": {
+        "@biomejs/biome": "1.9.4",
+        "@testing-library/dom": "^10.4.0",
+        "@testing-library/react": "^16.2.0",
+        "@types/react": "^19.0.8",
+        "@types/react-dom": "^19.0.3",
+        "@vitejs/plugin-react": "^4.3.4",
+        "jsdom": "^26.0.0",
+        "typescript": "^5.7.2",
+        "vite": "^6.1.0",
+        "vitest": "^3.0.5",
+        "web-vitals": "^4.2.4"
+    }
+}

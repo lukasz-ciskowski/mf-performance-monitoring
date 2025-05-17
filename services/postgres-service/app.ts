@@ -2,9 +2,12 @@ import express, { Express } from 'express';
 import './instrumentation';
 import { metrics, SpanStatusCode, trace } from '@opentelemetry/api';
 import { Pool } from 'pg'; // Import PostgreSQL client
+import cors from 'cors';
 
 const PORT: number = parseInt(process.env.PORT || '8082');
 const app: Express = express();
+
+app.use(cors());
 
 const tracer = trace.getTracer('postgres-service');
 
