@@ -1,15 +1,17 @@
 import express, { Express } from 'express';
 import './instrumentation';
-import { metrics, SpanStatusCode, trace } from '@opentelemetry/api';
+import { SpanStatusCode, trace } from '@opentelemetry/api';
 import { Db, MongoClient } from 'mongodb';
 import cors from 'cors';
+import { logs, SeverityNumber } from '@opentelemetry/api-logs';
+
+const logger = logs.getLogger('mongo-service');
+const tracer = trace.getTracer('mongo-service');
 
 const PORT: number = parseInt(process.env.PORT || '8081');
 const app: Express = express();
 
 app.use(cors());
-
-const tracer = trace.getTracer('mongo-service');
 
 // MongoDB connection setup
 const MONGO_URI = 'mongodb://mongo:27017';
@@ -39,6 +41,11 @@ app.get('/mongo', async (req, res) => {
         return;
     }
 
+    logger.emit({
+        severityNumber: SeverityNumber.INFO,
+        body: 'Received request to read from MongoDB',
+    });
+
     // Create a parent span for the entire operation
     tracer.startActiveSpan('request', async (parentSpan) => {
         try {
@@ -61,13 +68,21 @@ app.get('/mongo', async (req, res) => {
             const endTime = Date.now();
             parentSpan.setAttribute('execution_time_ms', endTime - startTime);
             parentSpan.end();
+
+            logger.emit({
+                severityNumber: SeverityNumber.INFO,
+                body: `MongoDB read successfully in ${endTime - startTime} ms`,
+            });
         } catch (error) {
             parentSpan.recordException(error as Error);
             parentSpan.setStatus({ code: SpanStatusCode.ERROR });
             res.status(500).json({ status: 500, message: 'Error reading from database' });
+            logger.emit({
+                severityNumber: SeverityNumber.ERROR,
+                body: `Error reading from MongoDB: ${(error as Error).message}`,
+            });
+
             parentSpan.end();
-        } finally {
-            await client.close();
         }
     });
 });

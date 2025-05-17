@@ -1,15 +1,17 @@
 import express, { Express } from 'express';
 import './instrumentation';
 import { metrics, SpanStatusCode, trace } from '@opentelemetry/api';
-import { Pool } from 'pg'; // Import PostgreSQL client
+import { Pool } from 'pg';
 import cors from 'cors';
+import { logs, SeverityNumber } from '@opentelemetry/api-logs';
+
+const logger = logs.getLogger('mongo-service');
+const tracer = trace.getTracer('postgres-service');
 
 const PORT: number = parseInt(process.env.PORT || '8082');
 const app: Express = express();
 
 app.use(cors());
-
-const tracer = trace.getTracer('postgres-service');
 
 // PostgreSQL connection setup
 const pool = new Pool({
@@ -22,6 +24,11 @@ const pool = new Pool({
 
 app.get('/postgres', async (req, res) => {
     const startTime = Date.now();
+
+    logger.emit({
+        severityNumber: SeverityNumber.INFO,
+        body: 'Received request to read from PostgreSQL',
+    });
 
     // Create a parent span for the entire operation
     tracer.startActiveSpan('request', async (parentSpan) => {
@@ -45,10 +52,20 @@ app.get('/postgres', async (req, res) => {
             const endTime = Date.now();
             parentSpan.setAttribute('execution_time_ms', endTime - startTime);
             parentSpan.end();
+
+            logger.emit({
+                severityNumber: SeverityNumber.INFO,
+                body: `PostgreSQL read successfully in ${endTime - startTime} ms`,
+            });
         } catch (error) {
             parentSpan.recordException(error as Error);
             parentSpan.setStatus({ code: SpanStatusCode.ERROR });
             res.status(500).json({ status: 500, message: 'Error reading from PostgreSQL database' });
+            logger.emit({
+                severityNumber: SeverityNumber.ERROR,
+                body: `Error reading from PostgreSQL: ${(error as Error).message}`,
+            });
+
             parentSpan.end();
         }
     });

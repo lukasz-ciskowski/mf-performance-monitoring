@@ -6,6 +6,8 @@ import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc';
+import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
+import { SimpleLogRecordProcessor } from '@opentelemetry/sdk-logs';
 
 process.env.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://otel-collector:4317';
 // process.env.OTEL_LOG_LEVEL = 'debug';
@@ -17,6 +19,7 @@ const sdk = new NodeSDK({
     metricReader: new PeriodicExportingMetricReader({
         exporter: new OTLPMetricExporter(),
     }),
+    logRecordProcessor: new SimpleLogRecordProcessor(new OTLPLogExporter()),
     instrumentations: [getNodeAutoInstrumentations()],
 });
 

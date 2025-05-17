@@ -1,20 +1,26 @@
 import express, { Express } from 'express';
 import './instrumentation';
-import { metrics, SpanStatusCode, trace } from '@opentelemetry/api';
+import { SpanStatusCode, trace } from '@opentelemetry/api';
 import { promises as fs } from 'fs';
 import path from 'path';
 import cors from 'cors';
+import { logs, SeverityNumber } from '@opentelemetry/api-logs';
+
+const logger = logs.getLogger('file-service');
+const tracer = trace.getTracer('file-service');
 
 const PORT: number = parseInt(process.env.PORT || '8080');
 const app: Express = express();
 
 app.use(cors());
 
-const tracer = trace.getTracer('file-service');
-
 app.get('/file', async (req, res) => {
     const startTime = Date.now();
 
+    logger.emit({
+        severityNumber: SeverityNumber.INFO,
+        body: 'Received request to read file',
+    });
     // Create a parent span for the entire operation
     tracer.startActiveSpan('request', async (parentSpan) => {
         try {
@@ -37,9 +43,17 @@ app.get('/file', async (req, res) => {
             const endTime = Date.now();
             parentSpan.setAttribute('execution_time_ms', endTime - startTime);
             parentSpan.end();
+            logger.emit({
+                severityNumber: SeverityNumber.INFO,
+                body: `File read successfully in ${endTime - startTime} ms`,
+            });
         } catch (error) {
             parentSpan.recordException(error as Error);
             parentSpan.setStatus({ code: SpanStatusCode.ERROR });
+            logger.emit({
+                severityNumber: SeverityNumber.ERROR,
+                body: `Error reading file: ${(error as Error).message}`,
+            });
             res.status(500).json({ status: 500, message: 'Error reading file' });
             parentSpan.end();
         }
