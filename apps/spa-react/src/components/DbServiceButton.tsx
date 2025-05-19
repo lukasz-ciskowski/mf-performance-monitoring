@@ -6,15 +6,18 @@ const DbServiceButton = () => {
     const [response, setResponse] = useState<string | null>(null);
     const handleClick = async () => {
         setResponse(null);
-        const singleSpan = provider.startSpan('db-multi-service-request');
-        context.with(trace.setSpan(context.active(), singleSpan), async () => {
-            const response = await fetch('http://localhost:8083/db');
-            const data = await response.json();
-            setResponse(JSON.stringify(data, null, 2));
+        const response = await fetch('/db-service/db');
+        const data = await response.json();
+        setResponse(JSON.stringify(data, null, 2));
+        // const singleSpan = provider.startSpan('db-multi-service-request');
+        // context.with(trace.setSpan(context.active(), singleSpan), async () => {
+        //     const response = await fetch('http://localhost:8083/db');
+        //     const data = await response.json();
+        //     setResponse(JSON.stringify(data, null, 2));
 
-            trace.getSpan(context.active())?.addEvent('fetching-single-span-completed');
-            singleSpan.end();
-        });
+        //     trace.getSpan(context.active())?.addEvent('fetching-single-span-completed');
+        //     singleSpan.end();
+        // });
     };
     return (
         <div>

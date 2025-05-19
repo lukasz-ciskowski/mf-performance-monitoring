@@ -30,21 +30,17 @@ const FrontendTracer = () => {
         tracerProvider: provider,
         instrumentations: [
             new FetchInstrumentation({
-                propagateTraceHeaderCorsUrls: /.*/,
-                clearTimingResources: true,
-                applyCustomAttributesOnSpan(span) {
-                    span.setAttribute('app.synthetic_request', 'false');
+                propagateTraceHeaderCorsUrls: [
+                    /.+/g, // Regex to match your backend URLs
+                ],
+                applyCustomAttributesOnSpan: (span, request, response) => {
+                    if (response instanceof Response) {
+                        const url = response.url;
+                        const service = url.split('/')[3]; // Extract the service name from the URL
+                        span.setAttribute('peer.service', service);
+                    }
                 },
             }),
-            // getWebAutoInstrumentations({
-            //     '@opentelemetry/instrumentation-fetch': {
-            //         propagateTraceHeaderCorsUrls: /.*/,
-            //         clearTimingResources: true,
-            //         applyCustomAttributesOnSpan(span) {
-            //             span.setAttribute('app.synthetic_request', 'false');
-            //         },
-            //     },
-            // }),
         ],
     });
 

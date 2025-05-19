@@ -20,7 +20,13 @@ const sdk = new NodeSDK({
         exporter: new OTLPMetricExporter(),
     }),
     logRecordProcessor: new SimpleLogRecordProcessor(new OTLPLogExporter()),
-    instrumentations: [getNodeAutoInstrumentations()],
+    instrumentations: [
+        getNodeAutoInstrumentations({
+            '@opentelemetry/instrumentation-dns': {
+                enabled: false,
+            },
+        }),
+    ],
 });
 
 sdk.start();

@@ -109,7 +109,7 @@ services:
         - "9411:9411"
 
     otel-collector:
-        image: otel/opentelemetry-collector:0.67.0
+        image: otel/opentelemetry-collector-contrib:latest
         restart: always
         command: ["--config=/etc/otelcol-config.yml"]
         volumes:
