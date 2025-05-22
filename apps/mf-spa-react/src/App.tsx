@@ -12,6 +12,7 @@ const Remote = lazyWithTelemetry(
 
 function App() {
     const [response, setResponse] = useState<string | null>(null);
+
     const handleClick = async () => {
         setResponse(null);
         const response = await axiosInstance.get('/db-service/db');
@@ -28,7 +29,8 @@ function App() {
                 )}
             </div>
             <Suspense fallback="loading...">
-                <Remote />
+                <Remote.Component traceparent={Remote.traceparent} />
+                {/* <Remote /> */}
             </Suspense>
         </div>
     );

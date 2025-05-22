@@ -33,6 +33,10 @@ export default defineConfig(({}) => {
                         requiredVersion: rootDependencies.zustand,
                         singleton: true,
                     },
+                    '@tanstack/react-query': {
+                        requiredVersion: dependencies['@tanstack/react-query'],
+                        singleton: true,
+                    },
                 },
             }),
             react(),

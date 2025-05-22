@@ -4,25 +4,27 @@ import { SpanKind } from '@opentelemetry/api';
 import { useTracingStore } from 'shared';
 import React from 'react';
 import { FrontendTracerInstance } from './FrontendTracer';
-// import { useTracingStore } from 'shared';
 
 export function lazyWithTelemetry(
     importFunc: () => Promise<{ default: ComponentType<unknown> }>,
     name: string,
-): React.LazyExoticComponent<ComponentType<unknown>> {
-    return React.lazy(async () => {
-        const span = FrontendTracerInstance.startSpan(`lazy-load:${name}`, { kind: SpanKind.CLIENT });
+): { Component: React.LazyExoticComponent<ComponentType<{ traceparent: string }>>; traceparent: string } {
+    const span = FrontendTracerInstance.startSpan(`lazy-load:${name}`, { kind: SpanKind.CLIENT });
+    const contextSpan = api.trace.setSpan(api.context.active(), span);
 
-        return api.context.with(api.trace.setSpan(api.context.active(), span), async () => {
-            useTracingStore.getState().setTracingKey(api.context.active());
-            useTracingStore.getState().setParentSpan(span);
-            await new Promise<void>((resolve) => {
-                setTimeout(() => resolve(), 1000);
-            });
-            const result = await importFunc();
+    return api.context.with(contextSpan, () => {
+        const headers: { traceparent: string } = { traceparent: '' };
+        api.propagation.inject(api.context.active(), headers);
+        return {
+            Component: React.lazy(async () => {
+                useTracingStore.getState().setTracingKey(headers['traceparent']);
 
-            span.end();
-            return result;
-        });
+                const result = await importFunc();
+
+                span.end();
+                return result;
+            }) as React.LazyExoticComponent<ComponentType<{ traceparent: string }>>,
+            traceparent: headers['traceparent'],
+        };
     });
 }

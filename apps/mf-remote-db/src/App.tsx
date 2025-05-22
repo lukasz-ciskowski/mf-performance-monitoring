@@ -1,36 +1,26 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import './App.css';
 import { axiosInstance } from './utils/axios';
-import { useTracingStore } from 'shared';
-import { context, propagation, SpanKind, trace } from '@opentelemetry/api';
+import { context, propagation, SpanKind } from '@opentelemetry/api';
 import { FrontendTracerInstance } from './utils/telemetry/FrontendTracer';
+import { useSuspenseQuery } from '@tanstack/react-query';
 
-function App() {
+function App({ traceparent }: { traceparent: string }) {
     const [response, setResponse] = useState<string | null>(null);
-    const state = useTracingStore();
-
-    useEffect(() => {
-        async function load() {
-            const ctx = propagation.extract(context.active(), state.tracingKey);
-
-            context.with(ctx, async () => {
-                const span = FrontendTracerInstance.startSpan(
-                    'LazyComponent:mount',
-                    { kind: SpanKind.SERVER },
-                    trace.setSpan(context.active(), state.parentSpan!),
-                );
-
-                await new Promise<void>((resolve) => {
-                    setTimeout(() => resolve(), 1000);
-                });
+    const { data: initialResponse } = useSuspenseQuery({
+        queryKey: ['initial'],
+        queryFn: async () => {
+            const ctx = propagation.extract(context.active(), { traceparent });
+            return context.with(ctx, async () => {
+                const span = FrontendTracerInstance.startSpan('LazyComponent:retrieve', { kind: SpanKind.SERVER });
+                const response = await axiosInstance.get('/db-service/db');
+                const data = response.data;
                 span.end();
+
+                return JSON.stringify(data, null, 2);
             });
-        }
-
-        load();
-    }, []);
-
-    console.log('Tracing state:', state);
+        },
+    });
 
     const handleClick = async () => {
         setResponse(null);
@@ -42,6 +32,11 @@ function App() {
     return (
         <div>
             <button onClick={handleClick}>Call DB multi service request - REMOTE</button>
+            {initialResponse && (
+                <pre style={{ backgroundColor: 'gray', color: 'white', textAlign: 'left' }}>
+                    Initial: {initialResponse}
+                </pre>
+            )}
             {response && <pre style={{ backgroundColor: 'gray', color: 'white', textAlign: 'left' }}>{response}</pre>}
         </div>
     );
