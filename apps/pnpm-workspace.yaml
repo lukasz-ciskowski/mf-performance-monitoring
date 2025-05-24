@@ -1,4 +1,0 @@
-packages:
-  - 'shared'
-  - 'mf-spa-react'
-  - 'mf-remote-db'

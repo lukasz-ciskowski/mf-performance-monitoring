@@ -47,6 +47,7 @@ services:
         - "8081:8081"
         depends_on:
         - mongo
+
     db-service:
         build:
             context: ./services/db-service
@@ -56,6 +57,27 @@ services:
         depends_on:
         - mongo-service
         - postgres-service
+
+    kafka-service:
+        build:
+            context: ./services/kafka-service
+            dockerfile: Dockerfile
+        ports:
+        - "8084:8084"
+
+    kafka-receiver-a:
+        build:
+            context: ./services/kafka-receiver-a
+            dockerfile: Dockerfile
+        ports:
+        - "8085:8085"
+
+    kafka-receiver-b:
+        build:
+            context: ./services/kafka-receiver-b
+            dockerfile: Dockerfile
+        ports:
+        - "8086:8086"
 
 volumes:
   postgres_data: {}

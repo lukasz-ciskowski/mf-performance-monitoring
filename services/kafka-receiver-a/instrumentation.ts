@@ -13,7 +13,7 @@ process.env.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://otel-collector:4317';
 // process.env.OTEL_LOG_LEVEL = 'debug';
 const sdk = new NodeSDK({
     resource: resourceFromAttributes({
-        [ATTR_SERVICE_NAME]: 'mongo-service',
+        [ATTR_SERVICE_NAME]: 'kafka-receiver-a',
     }),
     traceExporter: new OTLPTraceExporter(),
     metricReader: new PeriodicExportingMetricReader({

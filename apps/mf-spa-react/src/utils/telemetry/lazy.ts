@@ -1,7 +1,6 @@
 import { type ComponentType } from 'react';
 import * as api from '@opentelemetry/api';
 import { SpanKind } from '@opentelemetry/api';
-import { useTracingStore } from 'shared';
 import React from 'react';
 import { FrontendTracerInstance } from './FrontendTracer';
 
@@ -17,10 +16,7 @@ export function lazyWithTelemetry(
         api.propagation.inject(api.context.active(), headers);
         return {
             Component: React.lazy(async () => {
-                useTracingStore.getState().setTracingKey(headers['traceparent']);
-
                 const result = await importFunc();
-
                 span.end();
                 return result;
             }) as React.LazyExoticComponent<ComponentType<{ traceparent: string }>>,

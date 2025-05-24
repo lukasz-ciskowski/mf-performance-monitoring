@@ -12,8 +12,6 @@ receivers:
 
 connectors:
   servicegraph:
-    dimensions:
-      - db.system
     virtual_node_extra_label: true
   spanmetrics:
     histogram:
