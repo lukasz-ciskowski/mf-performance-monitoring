@@ -14,8 +14,8 @@ app.use(cors());
 
 // MongoDB connection setup
 const MONGO_URI = 'mongodb://mongo:27017';
-const DATABASE_NAME = 'test';
-const COLLECTION_NAME = 'kafka';
+const DATABASE_NAME = 'mongo-db';
+const COLLECTION_NAME = 'kafka-receiver-b';
 
 const client = new MongoClient(MONGO_URI);
 

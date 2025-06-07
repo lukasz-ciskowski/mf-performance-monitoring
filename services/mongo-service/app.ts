@@ -13,8 +13,8 @@ app.use(cors());
 
 // MongoDB connection setup
 const MONGO_URI = 'mongodb://mongo:27017';
-const DATABASE_NAME = 'test';
-const COLLECTION_NAME = 'hello';
+const DATABASE_NAME = 'mongo-db';
+const COLLECTION_NAME = 'mongo-service';
 
 const client = new MongoClient(MONGO_URI);
 
@@ -45,10 +45,15 @@ app.get('/mongo', async (req, res) => {
     });
 
     try {
-        const result = await db!.collection(COLLECTION_NAME).findOne<{ message: string }>();
-        const document = result?.message;
+        const randomNumber = Math.floor(Math.random() * 1000);
 
-        res.json({ status: 200, data: document });
+        const doc = { message: randomNumber, timestamp: new Date() };
+        const result = await db!.collection(COLLECTION_NAME).insertOne(doc);
+        if (!result.acknowledged) {
+            res.status(500).json({ status: 500, message: 'Failed to insert document' });
+            return;
+        }
+        res.json({ randomNumber: doc.message });
 
         const endTime = Date.now();
 

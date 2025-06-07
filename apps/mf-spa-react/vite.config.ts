@@ -2,7 +2,6 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { federation } from '@module-federation/vite';
 import { dependencies } from './package.json';
-import { dependencies as rootDependencies } from '../package.json';
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -13,13 +12,13 @@ export default defineConfig({
         strictPort: true,
         proxy: {
             '/file-service': {
-                target: 'http://localhost:8080',
+                target: 'http://file-service:8080',
                 changeOrigin: true,
                 secure: false,
                 rewrite: (path) => path.replace(/^\/file-service/, ''),
             },
             '/db-service': {
-                target: 'http://localhost:8083',
+                target: 'http://db-service:8083',
                 changeOrigin: true,
                 secure: false,
                 rewrite: (path) => path.replace(/^\/db-service/, ''),
@@ -46,10 +45,6 @@ export default defineConfig({
             shared: {
                 react: {
                     requiredVersion: dependencies.react,
-                    singleton: true,
-                },
-                zustand: {
-                    requiredVersion: rootDependencies.zustand,
                     singleton: true,
                 },
                 '@tanstack/react-query': {

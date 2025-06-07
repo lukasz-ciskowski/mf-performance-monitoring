@@ -28,6 +28,11 @@ const sdk = new NodeSDK({
             '@opentelemetry/instrumentation-net': {
                 enabled: false,
             },
+            '@opentelemetry/instrumentation-kafkajs': {
+                consumerHook: (span, info) => {
+                    span.setAttribute('peer.service', 'kafka-service');
+                },
+            },
         }),
     ],
 });

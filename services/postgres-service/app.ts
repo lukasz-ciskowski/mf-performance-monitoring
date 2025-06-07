@@ -1,11 +1,10 @@
 import express, { Express } from 'express';
 import './instrumentation';
-import { metrics, SpanKind, SpanStatusCode, trace } from '@opentelemetry/api';
 import { Pool } from 'pg';
 import cors from 'cors';
 import { logs, SeverityNumber } from '@opentelemetry/api-logs';
 
-const logger = logs.getLogger('mongo-service');
+const logger = logs.getLogger('postgres-service');
 
 const PORT: number = parseInt(process.env.PORT || '8082');
 const app: Express = express();
@@ -30,10 +29,10 @@ app.get('/postgres', async (req, res) => {
     });
 
     try {
-        const queryResult = await pool.query('SELECT * FROM hello LIMIT 1');
-        const result = queryResult.rows[0].message;
+        const randomNumber = Math.floor(Math.random() * 1000);
 
-        res.json({ status: 200, data: result });
+        await pool.query('INSERT INTO postgres_service (message) VALUES ($1)', [randomNumber]);
+        res.json({ randomNumber });
         const endTime = Date.now();
 
         logger.emit({
@@ -49,6 +48,11 @@ app.get('/postgres', async (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
+    await pool.connect();
+    console.log(`PostgreSQL connected successfully`);
+
+    await pool.query('CREATE TABLE IF NOT EXISTS postgres_service (id SERIAL PRIMARY KEY, message VARCHAR(255))');
+
     console.log(`Listening for requests on http://localhost:${PORT}`);
 });

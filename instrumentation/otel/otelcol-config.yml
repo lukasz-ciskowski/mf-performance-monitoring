@@ -46,10 +46,6 @@ exporters:
     endpoint: "0.0.0.0:9090"
     namespace: servicegraph
 
-  zipkin:
-    endpoint: "http://zipkin-all-in-one:9411/api/v2/spans"
-    format: proto
-
   otlphttp/logs:
     endpoint: http://loki:3100/otlp
     tls:
@@ -83,7 +79,7 @@ service:
   pipelines:
     traces:
       receivers: [otlp]
-      exporters: [zipkin, otlphttp/traces, spanmetrics, servicegraph]
+      exporters: [otlphttp/traces, spanmetrics, servicegraph]
       processors: [batch]
     metrics:
       receivers: [otlp, spanmetrics, servicegraph]

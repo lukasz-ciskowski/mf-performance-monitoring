@@ -38,57 +38,14 @@ services:
         ports:
         - "3100:3100"
         command: -config.file=/etc/loki/local-config.yaml
-
-    # alloy:
-    #     image: grafana/alloy:latest
-    #     ports:
-    #     - "12345:12345"
-    #     - "8027:8027"
-    #     - "4317:4317"
-    #     volumes:
-    #     - "./instrumentation/alloy/config.alloy:/etc/alloy/config.alloy"
-    #     command: [
-    #         "run",
-    #         "--server.http.listen-addr=0.0.0.0:12345",
-    #         "--stability.level=public-preview",
-    #         "/etc/alloy/config.alloy",
-    #     ]
-
-    # blackbox-exporter:
-    #     image: prom/blackbox-exporter:latest
-    #     container_name: blackbox-exporter
-    #     ports:
-    #     - "9115:9115"
-    #     command:
-    #     - --config.file=/etc/blackbox/blackbox.yml
-    #     volumes:
-    #     - ./instrumentation/blackbox/blackbox.yml:/etc/blackbox/blackbox.yml
-    #     restart: unless-stopped
-
-    # single-spa-react:
-    #     build:
-    #         context: ./single-spa-react
-    #         dockerfile: Dockerfile
-    #     ports:
-    #     - "4000:4000"
-    #     volumes:
-    #     - ./single-spa-react:/app
-    #     - node_modules:/app/node_modules
-    #     restart: unless-stopped
-
-    # jaeger-all-in-one:
-    #     image: jaegertracing/all-in-one:latest
-    #     restart: always
-    #     ports:
-    #     - "16686:16686"
-    #     - "14268"
-    #     - "14250"
-
+        volumes:
+        - ./tmp/loki/data:/loki
 
     prometheus:
         image: prom/prometheus:latest
         volumes:
         - "./instrumentation/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"
+        - "./tmp/prometheus/data:/prometheus"
         ports:
         - 9090:9090
 
@@ -102,12 +59,6 @@ services:
         - ./instrumentation/grafana/dashboards:/var/lib/grafana/dashboards
         restart: unless-stopped
 
-    zipkin-all-in-one:
-        image: openzipkin/zipkin:latest
-        restart: always
-        ports:
-        - "9411:9411"
-
     zookeeper:
         image: confluentinc/cp-zookeeper:latest
         container_name: zookeeper
@@ -116,6 +67,9 @@ services:
             ZOOKEEPER_TICK_TIME: 2000
         ports:
         - "2181:2181"
+        volumes:
+        - ./tmp/zookeeper/data:/var/lib/zookeeper/data
+        - ./tmp/zookeeper/log:/var/lib/zookeeper/log
 
     kafka:
         image: confluentinc/cp-kafka:latest
@@ -129,7 +83,8 @@ services:
             KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
             KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
             KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-
+        volumes:
+        - ./tmp/kafka/data:/var/lib/kafka/data
 
     otel-collector:
         image: otel/opentelemetry-collector-contrib:latest
@@ -146,7 +101,114 @@ services:
         - "4318:4318"   # OTLP HTTP receiver
         - "55679:55679" # zpages extension
         depends_on:
-        # - jaeger-all-in-one
-        - zipkin-all-in-one
         - prometheus
 
+    # Databases
+
+    postgres:
+        image: postgres:latest
+        container_name: postgres
+        restart: always
+        environment:
+            POSTGRES_USER: user
+            POSTGRES_PASSWORD: password
+        ports:
+        - "5432:5432"
+        volumes:
+        - ./tmp/postgres:/var/lib/postgresql/data
+
+    mongo:
+        image: mongo:latest
+        container_name: mongo
+        restart: always
+        ports:
+        - "27017:27017"
+        volumes:
+        - ./tmp/mongo:/data/db
+
+    # Services
+
+    file-service:
+        build:
+            context: ./services/file-service
+            dockerfile: Dockerfile
+        ports:
+        - "8080:8080"
+        - "9464:9464"
+
+    postgres-service:
+        build:
+            context: ./services/postgres-service
+            dockerfile: Dockerfile
+        ports:
+        - "8082:8082"
+        depends_on:
+        - postgres
+
+    mongo-service:
+        build:
+            context: ./services/mongo-service
+            dockerfile: Dockerfile
+        ports:
+        - "8081:8081"
+        depends_on:
+        - mongo
+
+    db-service:
+        build:
+            context: ./services/db-service
+            dockerfile: Dockerfile
+        ports:
+        - "8083:8083"
+        depends_on:
+        - mongo-service
+        - postgres-service
+
+    kafka-service:
+        build:
+            context: ./services/kafka-service
+            dockerfile: Dockerfile
+        ports:
+        - "8084:8084"
+        depends_on:
+        - kafka
+
+    kafka-receiver-a:
+        build:
+            context: ./services/kafka-receiver-a
+            dockerfile: Dockerfile
+        ports:
+        - "8085:8085"
+        depends_on:
+        - kafka
+
+    kafka-receiver-b:
+        build:
+            context: ./services/kafka-receiver-b
+            dockerfile: Dockerfile
+        ports:
+        - "8086:8086"
+        depends_on:
+        - kafka
+
+    # Frontends
+    spa-react:
+        build:
+            context: ./apps/spa-react
+            dockerfile: Dockerfile
+        ports:
+        - "3001:3001"
+
+    mf-spa-react:
+        build:
+            context: ./apps/mf-spa-react
+            dockerfile: Dockerfile
+        ports:
+        - "3002:3002"
+
+    mf-remote-ui:
+        build:
+            context: ./apps/mf-remote-ui
+            dockerfile: Dockerfile
+        ports:
+        - "3003:3003"

@@ -10,7 +10,7 @@ import { ZoneContextManager } from '@opentelemetry/context-zone';
 const FrontendTracer = () => {
     const provider = new WebTracerProvider({
         resource: resourceFromAttributes({
-            [ATTR_SERVICE_NAME]: 'remote-db-app',
+            [ATTR_SERVICE_NAME]: 'remote-ui-app',
         }),
         spanProcessors: [new SimpleSpanProcessor(new OTLPTraceExporter())],
     });
@@ -23,7 +23,7 @@ const FrontendTracer = () => {
             propagators: [new W3CBaggagePropagator(), new W3CTraceContextPropagator()],
         }),
     });
-    const webTracer = provider.getTracer('remote-db-app-tracer');
+    const webTracer = provider.getTracer('remote-ui-app-tracer');
 
     registerInstrumentations({
         tracerProvider: provider,

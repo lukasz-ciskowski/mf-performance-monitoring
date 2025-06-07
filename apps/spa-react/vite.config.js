@@ -23,13 +23,13 @@ export default defineConfig({
         strictPort: true,
         proxy: {
             '/file-service': {
-                target: 'http://localhost:8080',
+                target: 'http://file-service:8080',
                 changeOrigin: true,
                 secure: false,
                 rewrite: (path) => path.replace(/^\/file-service/, ''),
             },
             '/db-service': {
-                target: 'http://localhost:8083',
+                target: 'http://db-service:8083',
                 changeOrigin: true,
                 secure: false,
                 rewrite: (path) => path.replace(/^\/db-service/, ''),

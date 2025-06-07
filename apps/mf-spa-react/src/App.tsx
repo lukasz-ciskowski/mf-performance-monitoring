@@ -6,8 +6,8 @@ import { lazyWithTelemetry } from './utils/telemetry/lazy';
 const Remote = lazyWithTelemetry(
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
-    async () => import('remote/remote-db-app'),
-    'remote-db-app',
+    async () => import('remote/remote-ui-app'),
+    'remote-ui-app',
 );
 
 function App() {

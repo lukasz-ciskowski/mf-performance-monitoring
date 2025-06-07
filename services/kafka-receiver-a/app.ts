@@ -19,6 +19,11 @@ const kafka = new Kafka({
 const consumer = kafka.consumer({ groupId: 'test-group-a' });
 
 app.listen(PORT, async () => {
+    await pool.connect();
+    console.log(`PostgreSQL connected successfully`);
+
+    await pool.query('CREATE TABLE IF NOT EXISTS kafka_receiver_a (id SERIAL PRIMARY KEY, message VARCHAR(255))');
+
     console.log(`Listening for requests on http://localhost:${PORT}`);
 });
 
@@ -39,7 +44,7 @@ async function listen() {
         eachMessage: async ({ topic, partition, message }) => {
             console.log(`Received message: ${message.value?.toString()}`);
 
-            await pool.query('INSERT INTO hello(message) VALUES($1)', [message.value?.toString()]);
+            await pool.query('INSERT INTO kafka_receiver_a(message) VALUES($1)', [message.value?.toString()]);
 
             logger.emit({
                 severityNumber: SeverityNumber.INFO,
