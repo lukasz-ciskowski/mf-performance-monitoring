@@ -28,6 +28,9 @@ export default defineConfig({
     build: {
         target: 'chrome89',
     },
+    // optimizeDeps: {
+    //     include: Object.keys(dependencies),
+    // },
     plugins: [
         federation({
             name: 'host',

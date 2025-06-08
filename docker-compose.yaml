@@ -1,18 +1,18 @@
 version: "3.8"
 
 services:
-    init:
-        image: &tempoImage grafana/tempo:latest
-        user: root
-        entrypoint:
-        - "chown"
-        - "10001:10001"
-        - "/var/tempo"
-        volumes:
-        - ./tmp/tempo/data:/var/tempo
+    # init:
+    #     image: &tempoImage grafana/tempo:latest
+    #     user: root
+    #     entrypoint:
+    #     - "chown"
+    #     - "10001:10001"
+    #     - "/var/tempo"
+    #     volumes:
+    #     - ./tmp/tempo/data:/var/tempo
 
     tempo:
-        image: *tempoImage
+        image: grafana/tempo:latest
         command: [ "-config.file=/etc/tempo.yaml" ]
         volumes:
         - ./instrumentation/tempo/tempo.yaml:/etc/tempo.yaml
@@ -21,7 +21,6 @@ services:
         - "3200:3200" # tempo
         - "4183:4317" # otlp grpc
         depends_on:
-        - init
         - memcached
 
     memcached:
@@ -40,6 +39,7 @@ services:
         command: -config.file=/etc/loki/local-config.yaml
         volumes:
         - ./tmp/loki/data:/loki
+        restart: always
 
     prometheus:
         image: prom/prometheus:latest
@@ -48,6 +48,7 @@ services:
         - "./tmp/prometheus/data:/prometheus"
         ports:
         - 9090:9090
+        restart: always
 
     grafana:
         image: grafana/grafana:latest
@@ -57,7 +58,7 @@ services:
         - ./tmp/grafana/data:/var/lib/grafana
         - ./instrumentation/grafana/provisioning:/etc/grafana/provisioning
         - ./instrumentation/grafana/dashboards:/var/lib/grafana/dashboards
-        restart: unless-stopped
+        restart: always
 
     zookeeper:
         image: confluentinc/cp-zookeeper:latest
@@ -70,6 +71,7 @@ services:
         volumes:
         - ./tmp/zookeeper/data:/var/lib/zookeeper/data
         - ./tmp/zookeeper/log:/var/lib/zookeeper/log
+        restart: always
 
     kafka:
         image: confluentinc/cp-kafka:latest
@@ -85,6 +87,12 @@ services:
             KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
         volumes:
         - ./tmp/kafka/data:/var/lib/kafka/data
+        restart: always
+        healthcheck:
+            test: [ "CMD", "kafka-topics", "--bootstrap-server", "localhost:9092", "--list" ]
+            interval: 10s
+            timeout: 5s
+            retries: 5
 
     otel-collector:
         image: otel/opentelemetry-collector-contrib:latest
@@ -135,6 +143,7 @@ services:
         ports:
         - "8080:8080"
         - "9464:9464"
+        restart: always
 
     postgres-service:
         build:
@@ -144,6 +153,7 @@ services:
         - "8082:8082"
         depends_on:
         - postgres
+        restart: always
 
     mongo-service:
         build:
@@ -153,6 +163,7 @@ services:
         - "8081:8081"
         depends_on:
         - mongo
+        restart: always
 
     db-service:
         build:
@@ -163,6 +174,7 @@ services:
         depends_on:
         - mongo-service
         - postgres-service
+        restart: always
 
     kafka-service:
         build:
@@ -171,7 +183,9 @@ services:
         ports:
         - "8084:8084"
         depends_on:
-        - kafka
+            kafka:
+                condition: service_healthy
+        restart: always
 
     kafka-receiver-a:
         build:
@@ -180,7 +194,9 @@ services:
         ports:
         - "8085:8085"
         depends_on:
-        - kafka
+            kafka:
+                condition: service_healthy
+        restart: always
 
     kafka-receiver-b:
         build:
@@ -189,15 +205,18 @@ services:
         ports:
         - "8086:8086"
         depends_on:
-        - kafka
+            kafka:
+                condition: service_healthy
+        restart: always
 
-    # Frontends
+    # # Frontends
     spa-react:
         build:
             context: ./apps/spa-react
             dockerfile: Dockerfile
         ports:
         - "3001:3001"
+        restart: always
 
     mf-spa-react:
         build:
@@ -205,6 +224,7 @@ services:
             dockerfile: Dockerfile
         ports:
         - "3002:3002"
+        restart: always
 
     mf-remote-ui:
         build:
@@ -212,3 +232,4 @@ services:
             dockerfile: Dockerfile
         ports:
         - "3003:3003"
+        restart: always
