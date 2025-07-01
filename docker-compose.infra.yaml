@@ -1,16 +1,6 @@
 version: "3.8"
 
 services:
-    # init:
-    #     image: &tempoImage grafana/tempo:latest
-    #     user: root
-    #     entrypoint:
-    #     - "chown"
-    #     - "10001:10001"
-    #     - "/var/tempo"
-    #     volumes:
-    #     - ./tmp/tempo/data:/var/tempo
-
     tempo:
         image: grafana/tempo:latest
         command: [ "-config.file=/etc/tempo.yaml" ]
@@ -74,7 +64,7 @@ services:
         restart: always
 
     kafka:
-        image: confluentinc/cp-kafka:7.9.0
+        image: confluentinc/cp-kafka:latest
         container_name: kafka
         depends_on:
         - zookeeper
@@ -85,6 +75,7 @@ services:
             KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
             KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
             KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+            KAFKA_PROCESS_ROLES: 'broker,controller' # <--- ADD THIS LINE
         volumes:
         - ./tmp/kafka/data:/var/lib/kafka/data
         restart: always
@@ -111,8 +102,6 @@ services:
         depends_on:
         - prometheus
 
-    # Databases
-
     postgres:
         image: postgres:latest
         container_name: postgres
@@ -133,103 +122,3 @@ services:
         - "27017:27017"
         volumes:
         - ./tmp/mongo:/data/db
-
-    # Services
-
-    file-service:
-        build:
-            context: ./services/file-service
-            dockerfile: Dockerfile
-        ports:
-        - "8080:8080"
-        - "9464:9464"
-        restart: always
-
-    postgres-service:
-        build:
-            context: ./services/postgres-service
-            dockerfile: Dockerfile
-        ports:
-        - "8082:8082"
-        depends_on:
-        - postgres
-        restart: always
-
-    mongo-service:
-        build:
-            context: ./services/mongo-service
-            dockerfile: Dockerfile
-        ports:
-        - "8081:8081"
-        depends_on:
-        - mongo
-        restart: always
-
-    db-service:
-        build:
-            context: ./services/db-service
-            dockerfile: Dockerfile
-        ports:
-        - "8083:8083"
-        depends_on:
-        - mongo-service
-        - postgres-service
-        restart: always
-
-    kafka-service:
-        build:
-            context: ./services/kafka-service
-            dockerfile: Dockerfile
-        ports:
-        - "8084:8084"
-        depends_on:
-            kafka:
-                condition: service_healthy
-        restart: always
-
-    kafka-receiver-a:
-        build:
-            context: ./services/kafka-receiver-a
-            dockerfile: Dockerfile
-        ports:
-        - "8085:8085"
-        depends_on:
-            kafka:
-                condition: service_healthy
-        restart: always
-
-    kafka-receiver-b:
-        build:
-            context: ./services/kafka-receiver-b
-            dockerfile: Dockerfile
-        ports:
-        - "8086:8086"
-        depends_on:
-            kafka:
-                condition: service_healthy
-        restart: always
-
-    # # Frontends
-    spa-react:
-        build:
-            context: ./apps/spa-react
-            dockerfile: Dockerfile
-        ports:
-        - "3001:3001"
-        restart: always
-
-    mf-spa-react:
-        build:
-            context: ./apps/mf-spa-react
-            dockerfile: Dockerfile
-        ports:
-        - "3002:3002"
-        restart: always
-
-    mf-remote-ui:
-        build:
-            context: ./apps/mf-remote-ui
-            dockerfile: Dockerfile
-        ports:
-        - "3003:3003"
-        restart: always

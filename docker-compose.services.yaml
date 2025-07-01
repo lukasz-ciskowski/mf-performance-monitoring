@@ -1,0 +1,75 @@
+version: "3.8"
+
+services:
+    file-service:
+        build:
+            context: ./services/file-service
+            dockerfile: Dockerfile
+        ports:
+        - "8080:8080"
+        - "9464:9464"
+        restart: always
+
+    postgres-service:
+        build:
+            context: ./services/postgres-service
+            dockerfile: Dockerfile
+        ports:
+        - "8082:8082"
+        depends_on:
+        - postgres
+        restart: always
+
+    mongo-service:
+        build:
+            context: ./services/mongo-service
+            dockerfile: Dockerfile
+        ports:
+        - "8081:8081"
+        depends_on:
+        - mongo
+        restart: always
+
+    db-service:
+        build:
+            context: ./services/db-service
+            dockerfile: Dockerfile
+        ports:
+        - "8083:8083"
+        depends_on:
+        - mongo-service
+        - postgres-service
+        restart: always
+
+    kafka-service:
+        build:
+            context: ./services/kafka-service
+            dockerfile: Dockerfile
+        ports:
+        - "8084:8084"
+        depends_on:
+            kafka:
+                condition: service_healthy
+        restart: always
+
+    kafka-receiver-a:
+        build:
+            context: ./services/kafka-receiver-a
+            dockerfile: Dockerfile
+        ports:
+        - "8085:8085"
+        depends_on:
+            kafka:
+                condition: service_healthy
+        restart: always
+
+    kafka-receiver-b:
+        build:
+            context: ./services/kafka-receiver-b
+            dockerfile: Dockerfile
+        ports:
+        - "8086:8086"
+        depends_on:
+            kafka:
+                condition: service_healthy
+        restart: always
