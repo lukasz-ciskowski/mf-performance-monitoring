@@ -12,7 +12,7 @@ services:
     #     - ./tmp/tempo/data:/var/tempo
 
     tempo:
-        image: grafana/tempo:latest
+        image: grafana/tempo:2.8.0
         command: [ "-config.file=/etc/tempo.yaml" ]
         volumes:
         - ./instrumentation/tempo/tempo.yaml:/etc/tempo.yaml
@@ -33,7 +33,7 @@ services:
         - MEMCACHED_THREADS=4
 
     loki:
-        image: grafana/loki:latest
+        image: grafana/loki:main-075a5ec
         ports:
         - "3100:3100"
         command: -config.file=/etc/loki/local-config.yaml
@@ -42,7 +42,7 @@ services:
         restart: always
 
     prometheus:
-        image: prom/prometheus:latest
+        image: prom/prometheus:v3.4.1
         volumes:
         - "./instrumentation/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"
         - "./tmp/prometheus/data:/prometheus"
@@ -51,7 +51,7 @@ services:
         restart: always
 
     grafana:
-        image: grafana/grafana:latest
+        image: grafana/grafana:12.0.1
         ports:
         - "3000:3000"
         volumes:
@@ -61,7 +61,7 @@ services:
         restart: always
 
     zookeeper:
-        image: confluentinc/cp-zookeeper:latest
+        image: confluentinc/cp-zookeeper:7.2.15
         container_name: zookeeper
         environment:
             ZOOKEEPER_CLIENT_PORT: 2181
@@ -95,7 +95,7 @@ services:
             retries: 5
 
     otel-collector:
-        image: otel/opentelemetry-collector-contrib:latest
+        image: otel/opentelemetry-collector-contrib:0.127.0
         restart: always
         command: ["--config=/etc/otelcol-config.yml"]
         volumes:
@@ -114,7 +114,7 @@ services:
     # Databases
 
     postgres:
-        image: postgres:latest
+        image: postgres:17.5-alpine
         container_name: postgres
         restart: always
         environment:
