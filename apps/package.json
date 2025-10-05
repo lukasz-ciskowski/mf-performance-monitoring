@@ -1,0 +1,71 @@
+{
+    "name": "microfrontends-workspace",
+    "version": "1.0.0",
+    "description": "Workspace for all microfrontend applications",
+    "private": true,
+    "scripts": {
+        "dev": "concurrently \"npm run dev:spa\" \"npm run dev:mf-host\" \"npm run dev:mf-remote\"",
+        "dev:spa": "cd spa-react && npm run dev --",
+        "dev:mf-host": "cd mf-spa-react && npm run dev --",
+        "dev:mf-remote": "cd mf-remote-ui && npm run dev --",
+        "dev:auto": "concurrently \"npm run dev:spa:auto\" \"npm run dev:mf-host:auto\" \"npm run dev:mf-remote:auto\"",
+        "dev:spa:auto": "cd spa-react && npm run dev",
+        "dev:mf-host:auto": "cd mf-spa-react && npm run dev",
+        "dev:mf-remote:auto": "cd mf-remote-ui && npm run dev",
+        "build": "concurrently \"npm run build:spa\" \"npm run build:mf-host\" \"npm run build:mf-remote\"",
+        "build:spa": "cd spa-react && npm run build",
+        "build:mf-host": "cd mf-spa-react && npm run build",
+        "build:mf-remote": "cd mf-remote-ui && npm run build",
+        "preview": "concurrently \"npm run preview:spa\" \"npm run preview:mf-host\" \"npm run preview:mf-remote\"",
+        "preview:spa": "cd spa-react && npm run preview",
+        "preview:mf-host": "cd mf-spa-react && npm run preview",
+        "preview:mf-remote": "cd mf-remote-ui && npm run preview",
+        "install:all": "concurrently \"npm run install:spa\" \"npm run install:mf-host\" \"npm run install:mf-remote\"",
+        "install:spa": "cd spa-react && pnpm install",
+        "install:mf-host": "cd mf-spa-react && pnpm install",
+        "install:mf-remote": "cd mf-remote-ui && pnpm install",
+        "clean": "concurrently \"npm run clean:spa\" \"npm run clean:mf-host\" \"npm run clean:mf-remote\"",
+        "clean:spa": "cd spa-react && rm -rf node_modules dist",
+        "clean:mf-host": "cd mf-spa-react && rm -rf node_modules dist",
+        "clean:mf-remote": "cd mf-remote-ui && rm -rf node_modules dist",
+        "lint": "concurrently \"npm run lint:spa\" \"npm run lint:mf-host\" \"npm run lint:mf-remote\"",
+        "lint:spa": "cd spa-react && npm run lint",
+        "lint:mf-host": "cd mf-spa-react && npm run lint",
+        "lint:mf-remote": "cd mf-remote-ui && npm run lint",
+        "type-check": "concurrently \"npm run type-check:spa\" \"npm run type-check:mf-host\" \"npm run type-check:mf-remote\"",
+        "type-check:spa": "cd spa-react && npx tsc --noEmit",
+        "type-check:mf-host": "cd mf-spa-react && npx tsc --noEmit",
+        "type-check:mf-remote": "cd mf-remote-ui && npx tsc --noEmit",
+        "start:production": "concurrently \"npm run start:spa\" \"npm run start:mf-host\" \"npm run start:mf-remote\"",
+        "start:spa": "cd spa-react && npm run preview -- --host",
+        "start:mf-host": "cd mf-spa-react && npm run preview -- --host",
+        "start:mf-remote": "cd mf-remote-ui && npm run preview -- --host",
+        "kill-ports": "npx kill-port 3001 3002 3003 4001 4002 4003",
+        "check-ports": "npx is-port-reachable 3001 && npx is-port-reachable 3002 && npx is-port-reachable 3003 && npx is-port-reachable 4001 && npx is-port-reachable 4002 && npx is-port-reachable 4003"
+    },
+    "devDependencies": {
+        "concurrently": "^8.2.2",
+        "kill-port": "^2.0.1",
+        "is-port-reachable": "^4.0.0"
+    },
+    "engines": {
+        "node": ">=18.0.0",
+        "pnpm": ">=8.0.0"
+    },
+    "keywords": [
+        "microfrontends",
+        "module-federation",
+        "single-spa",
+        "react",
+        "vite",
+        "monitoring",
+        "opentelemetry"
+    ],
+    "author": "Łukasz Ciskowski",
+    "license": "MIT",
+    "workspaces": [
+        "spa-react",
+        "mf-spa-react",
+        "mf-remote-ui"
+    ]
+}
