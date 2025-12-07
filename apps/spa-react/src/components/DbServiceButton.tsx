@@ -1,6 +1,4 @@
 import { useState } from 'react';
-import { provider } from '@/main';
-import { context, trace } from '@opentelemetry/api';
 
 const DbServiceButton = () => {
     const [response, setResponse] = useState<string | null>(null);

@@ -26,6 +26,7 @@ app.get('/file', async (req, res) => {
         const fileContent = await tracer.startActiveSpan('file-read-operation', async (readSpan) => {
             readSpan.addEvent('starting-file-read');
             const content = await fs.readFile(path.join(__dirname, 'file.txt'), 'utf-8');
+            await new Promise((resolve) => setTimeout(resolve, 5000)); // Simulate delay
             readSpan.addEvent('finished-file-read');
             readSpan.end();
             return content;

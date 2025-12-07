@@ -1,40 +1,35 @@
-// Manual OpenTelemetry setup for Next.js (not Vercel approach)
 export async function register() {
     if (process.env.NEXT_RUNTIME === 'nodejs') {
-        // Dynamic import to avoid issues with ESM/CJS - use default exports
-        const sdkNode = await import('@opentelemetry/sdk-trace-node');
-        const instHttp = await import('@opentelemetry/instrumentation-http');
-        const resourcesModule = await import('@opentelemetry/resources');
-        const semconv = await import('@opentelemetry/semantic-conventions');
-        const traceExporterModule = await import('@opentelemetry/exporter-trace-otlp-http');
-        const metricExporterModule = await import('@opentelemetry/exporter-metrics-otlp-http');
-        const sdkMetricsModule = await import('@opentelemetry/sdk-metrics');
+        const { NodeSDK } = await import('@opentelemetry/sdk-node');
+        const { OTLPTraceExporter } = await import('@opentelemetry/exporter-trace-otlp-http');
+        const { OTLPMetricExporter } = await import('@opentelemetry/exporter-metrics-otlp-http');
+        const { PeriodicExportingMetricReader } = await import('@opentelemetry/sdk-metrics');
+        const { resourceFromAttributes } = await import('@opentelemetry/resources');
+        const { ATTR_SERVICE_NAME } = await import('@opentelemetry/semantic-conventions');
+        const { HttpInstrumentation } = await import('@opentelemetry/instrumentation-http');
 
         const otlpEndpoint = process.env.OTEL_EXPORTER_OTLP_ENDPOINT || 'http://localhost:4318';
 
-        const resource = resourcesModule.default.Resource.default().merge(
-            new resourcesModule.default.Resource({
-                [semconv.default.SEMRESATTRS_SERVICE_NAME]: 'ssr-react',
-                [semconv.default.SEMRESATTRS_SERVICE_VERSION]: process.env.SERVICE_VERSION || '1.0.0',
-                'service.namespace': 'frontend',
-                'service.instance.id': process.env.HOSTNAME || 'localhost',
-            }),
-        );
+        const resource = resourceFromAttributes({
+            [ATTR_SERVICE_NAME]: 'ssr-react',
+            'service.version': process.env.SERVICE_VERSION || '1.0.0',
+            'service.namespace': 'frontend',
+        });
 
-        const sdk = new sdkNode.default.NodeSDK({
+        const sdk = new NodeSDK({
             resource,
-            traceExporter: new traceExporterModule.default.OTLPTraceExporter({
+            traceExporter: new OTLPTraceExporter({
                 url: `${otlpEndpoint}/v1/traces`,
             }),
-            metricReader: new sdkMetricsModule.default.PeriodicExportingMetricReader({
-                exporter: new metricExporterModule.default.OTLPMetricExporter({
+            metricReader: new PeriodicExportingMetricReader({
+                exporter: new OTLPMetricExporter({
                     url: `${otlpEndpoint}/v1/metrics`,
                 }),
+                exportIntervalMillis: 5000,
             }),
             instrumentations: [
-                new instHttp.default.HttpInstrumentation({
+                new HttpInstrumentation({
                     ignoreIncomingRequestHook: (req) => {
-                        // Ignore health checks and static assets
                         const url = req.url || '';
                         return url.includes('_next') || url.includes('favicon') || url === '/health';
                     },
@@ -43,13 +38,12 @@ export async function register() {
         });
 
         sdk.start();
-        console.log('OpenTelemetry initialized for ssr-react (manual setup)');
+        console.log('[OpenTelemetry] Initialized for ssr-react (server-side)');
 
-        // Graceful shutdown
         process.on('SIGTERM', () => {
             sdk.shutdown()
-                .then(() => console.log('OpenTelemetry terminated'))
-                .catch((error: Error) => console.log('Error terminating OpenTelemetry', error))
+                .then(() => console.log('[OpenTelemetry] Shutdown complete'))
+                .catch((error: Error) => console.log('[OpenTelemetry] Error during shutdown', error))
                 .finally(() => process.exit(0));
         });
     }

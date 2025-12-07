@@ -2,6 +2,7 @@
 
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Suspense } from 'react';
+import { usePageRenderMetrics } from '../hooks/usePageRenderMetrics';
 
 const BFF_URL = process.env.NEXT_PUBLIC_BFF_URL || 'http://localhost:8087';
 
@@ -27,6 +28,8 @@ export function KafkaContent({ initialData }: { initialData: any }) {
 }
 
 function KafkaDataDisplay({ initialData }: { initialData: any }) {
+    usePageRenderMetrics({ pageName: 'KafkaPage' });
+
     const { data, refetch, isFetching } = useSuspenseQuery({
         queryKey: ['kafka'],
         queryFn: fetchKafka,

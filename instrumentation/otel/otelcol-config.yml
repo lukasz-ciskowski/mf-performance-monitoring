@@ -41,6 +41,11 @@ connectors:
 exporters:
   prometheus:
     endpoint: "0.0.0.0:8889"
+    # Enable delta temporality support for frontend histograms
+    enable_open_metrics: true
+    # Send cumulative to Prometheus (it expects cumulative counters)
+    resource_to_telemetry_conversion:
+      enabled: true
 
   prometheus/servicegraph:
     endpoint: "0.0.0.0:9090"

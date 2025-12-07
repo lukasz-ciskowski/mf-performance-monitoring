@@ -2,6 +2,8 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { type ReactNode, useState } from 'react';
+import { TelemetryInitializer } from './components/TelemetryInitializer';
+import { NavigationTracker } from './components/NavigationTracker';
 
 export function Providers({ children }: { children: ReactNode }) {
     const [queryClient] = useState(
@@ -16,5 +18,11 @@ export function Providers({ children }: { children: ReactNode }) {
             }),
     );
 
-    return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+    return (
+        <QueryClientProvider client={queryClient}>
+            <TelemetryInitializer />
+            <NavigationTracker />
+            {children}
+        </QueryClientProvider>
+    );
 }

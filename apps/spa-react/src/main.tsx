@@ -8,15 +8,21 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { routeTree } from './routeTree.gen';
 
 import './styles.css';
-import reportWebVitals from './reportWebVitals.ts';
-import FrontendTracer from './utils/telemetry/FrontendTracer.ts';
-import { initWebVitalsMonitoring } from './utils/telemetry/webVitalsMetrics.ts';
+// import FrontendTracer from './utils/telemetry/FrontendTracer.ts';
+import './utils/telemetry/web-vitals.ts';
+import './utils/telemetry/navigation-metrics.ts';
+import { startRouteSwitch } from './utils/telemetry/navigation-metrics';
+// import { initWebVitalsMonitoring } from './utils/telemetry/webVitalsMetrics.ts';
+// import { initRUMMetrics } from './utils/telemetry/rumMetrics.ts';
 
 // Initialize OpenTelemetry tracing
-export const provider = FrontendTracer();
+// export const provider = FrontendTracer();
 
 // Initialize Web Vitals monitoring (LCP, FID, INP, CLS, FCP, TTFB)
-initWebVitalsMonitoring();
+// initWebVitalsMonitoring();
+
+// Initialize RUM (Real User Monitoring) metrics
+// initRUMMetrics();
 
 // Create a new router instance
 const router = createRouter({
@@ -28,12 +34,21 @@ const router = createRouter({
     defaultPreloadStaleTime: 0,
 });
 
+// Track route changes for navigation metrics
+router.subscribe('onBeforeLoad', (event) => {
+    const toPath = event.toLocation.pathname;
+    startRouteSwitch(toPath);
+});
+
 // Create React Query client
-const queryClient = new QueryClient({
+export const queryClient = new QueryClient({
     defaultOptions: {
         queries: {
             retry: false,
             staleTime: 0,
+            refetchOnWindowFocus: false,
+            refetchOnReconnect: false,
+            refetchOnMount: false,
         },
     },
 });
@@ -74,4 +89,4 @@ if (rootElement && !rootElement.innerHTML) {
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+// reportWebVitals();

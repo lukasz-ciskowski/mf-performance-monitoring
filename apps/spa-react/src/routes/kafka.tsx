@@ -2,13 +2,20 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Suspense } from 'react';
 import { ErrorBoundary } from '../components/ErrorBoundary';
+import { usePageRenderMetrics } from '../hooks/usePageRenderMetrics';
 
 const BFF = import.meta.env.VITE_BFF_URL || 'http://localhost:8087';
 
 async function fetchKafka() {
-    const res = await fetch(`${BFF}/kafka`);
-    if (!res.ok) throw new Error(`Failed to fetch kafka: ${res.status} ${res.statusText}`);
-    return res.json();
+    try {
+        const res = await fetch(`${BFF}/kafka`);
+        const data = await res.json();
+
+        if (!res.ok) throw new Error(`Failed to fetch kafka: ${res.status} ${res.statusText}`);
+        return data;
+    } catch (error) {
+        throw error;
+    }
 }
 
 export const Route = createFileRoute('/kafka')({
@@ -16,6 +23,8 @@ export const Route = createFileRoute('/kafka')({
 });
 
 function KafkaPage() {
+    usePageRenderMetrics({ pageName: 'KafkaPage' });
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-purple-50 to-violet-100">
             <nav className="bg-white shadow-sm border-b">
@@ -44,10 +53,16 @@ function KafkaPage() {
 }
 
 function KafkaContent() {
+    usePageRenderMetrics({ pageName: 'KafkaContent' });
+
     const { data, refetch, isFetching } = useSuspenseQuery({
         queryKey: ['kafka'],
         queryFn: fetchKafka,
     });
+
+    const handleRefetch = () => {
+        refetch();
+    };
 
     return (
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
@@ -58,7 +73,7 @@ function KafkaContent() {
                 </div>
                 <button
                     className="px-4 py-2 bg-white text-purple-600 rounded-lg font-medium hover:bg-purple-50 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                    onClick={() => refetch()}
+                    onClick={handleRefetch}
                     disabled={isFetching}
                 >
                     {isFetching ? (

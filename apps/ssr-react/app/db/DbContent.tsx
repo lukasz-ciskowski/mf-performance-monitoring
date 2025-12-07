@@ -2,6 +2,7 @@
 
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Suspense } from 'react';
+import { usePageRenderMetrics } from '../hooks/usePageRenderMetrics';
 
 const BFF_URL = process.env.NEXT_PUBLIC_BFF_URL || 'http://localhost:8087';
 
@@ -27,6 +28,8 @@ export function DbContent({ initialData }: { initialData: any }) {
 }
 
 function DbDataDisplay({ initialData }: { initialData: any }) {
+    usePageRenderMetrics({ pageName: 'DbPage' });
+
     const { data, refetch, isFetching } = useSuspenseQuery({
         queryKey: ['db'],
         queryFn: fetchDb,

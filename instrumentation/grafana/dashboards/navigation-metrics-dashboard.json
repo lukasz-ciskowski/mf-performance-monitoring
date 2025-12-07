@@ -1,0 +1,255 @@
+{
+    "dashboard": {
+        "title": "Navigation & Screen Render Metrics",
+        "tags": ["frontend", "navigation", "performance", "spa-react"],
+        "timezone": "browser",
+        "schemaVersion": 16,
+        "refresh": "30s",
+        "time": {
+            "from": "now-1h",
+            "to": "now"
+        },
+        "panels": [
+            {
+                "title": "Route Switch Duration - P50, P90, P95",
+                "type": "graph",
+                "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 },
+                "targets": [
+                    {
+                        "expr": "histogram_quantile(0.50, sum by (le, route_to) (rate(frontend_navigation_route_switch_milliseconds_bucket[5m])))",
+                        "legendFormat": "P50 - {{route_to}}"
+                    },
+                    {
+                        "expr": "histogram_quantile(0.90, sum by (le, route_to) (rate(frontend_navigation_route_switch_milliseconds_bucket[5m])))",
+                        "legendFormat": "P90 - {{route_to}}"
+                    },
+                    {
+                        "expr": "histogram_quantile(0.95, sum by (le, route_to) (rate(frontend_navigation_route_switch_milliseconds_bucket[5m])))",
+                        "legendFormat": "P95 - {{route_to}}"
+                    }
+                ],
+                "yaxes": [
+                    {
+                        "format": "ms",
+                        "label": "Duration"
+                    }
+                ]
+            },
+            {
+                "title": "Screen Render Duration - P95 by Screen",
+                "type": "graph",
+                "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 },
+                "targets": [
+                    {
+                        "expr": "histogram_quantile(0.95, sum by (le, screen_name) (rate(frontend_navigation_screen_render_milliseconds_bucket[5m])))",
+                        "legendFormat": "{{screen_name}}"
+                    }
+                ],
+                "yaxes": [
+                    {
+                        "format": "ms",
+                        "label": "Render Time"
+                    }
+                ]
+            },
+            {
+                "title": "Navigation Rate by Route",
+                "type": "graph",
+                "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 },
+                "targets": [
+                    {
+                        "expr": "sum by (route_to) (rate(frontend_navigation_route_switch_milliseconds_count[5m]))",
+                        "legendFormat": "{{route_to}}"
+                    }
+                ],
+                "yaxes": [
+                    {
+                        "format": "reqps",
+                        "label": "Navigation/sec"
+                    }
+                ]
+            },
+            {
+                "title": "Screen Render Count by Screen",
+                "type": "graph",
+                "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 },
+                "targets": [
+                    {
+                        "expr": "sum by (screen_name) (rate(frontend_navigation_screen_render_milliseconds_count[5m]))",
+                        "legendFormat": "{{screen_name}}"
+                    }
+                ],
+                "yaxes": [
+                    {
+                        "format": "rps",
+                        "label": "Renders/sec"
+                    }
+                ]
+            },
+            {
+                "title": "Slowest Routes (P95)",
+                "type": "bargauge",
+                "gridPos": { "x": 0, "y": 16, "w": 6, "h": 8 },
+                "targets": [
+                    {
+                        "expr": "topk(5, histogram_quantile(0.95, sum by (le, route_to) (rate(frontend_navigation_route_switch_milliseconds_bucket[5m]))))",
+                        "legendFormat": "{{route_to}}"
+                    }
+                ],
+                "options": {
+                    "orientation": "horizontal",
+                    "displayMode": "gradient"
+                }
+            },
+            {
+                "title": "Slowest Screens (P95)",
+                "type": "bargauge",
+                "gridPos": { "x": 6, "y": 16, "w": 6, "h": 8 },
+                "targets": [
+                    {
+                        "expr": "topk(5, histogram_quantile(0.95, sum by (le, screen_name) (rate(frontend_navigation_screen_render_milliseconds_bucket[5m]))))",
+                        "legendFormat": "{{screen_name}}"
+                    }
+                ],
+                "options": {
+                    "orientation": "horizontal",
+                    "displayMode": "gradient"
+                }
+            },
+            {
+                "title": "Route Switch Heatmap",
+                "type": "heatmap",
+                "gridPos": { "x": 12, "y": 16, "w": 12, "h": 8 },
+                "targets": [
+                    {
+                        "expr": "sum by (le) (increase(frontend_navigation_route_switch_milliseconds_bucket[1m]))",
+                        "format": "heatmap"
+                    }
+                ]
+            },
+            {
+                "title": "Fast vs Slow Navigations",
+                "type": "stat",
+                "gridPos": { "x": 0, "y": 24, "w": 6, "h": 4 },
+                "targets": [
+                    {
+                        "expr": "sum(rate(frontend_navigation_route_switch_milliseconds_bucket{le=\"500\"}[5m])) / sum(rate(frontend_navigation_route_switch_milliseconds_count[5m])) * 100",
+                        "legendFormat": "Fast (<500ms)"
+                    }
+                ],
+                "options": {
+                    "graphMode": "none",
+                    "colorMode": "value",
+                    "unit": "percent",
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            { "value": 0, "color": "red" },
+                            { "value": 70, "color": "yellow" },
+                            { "value": 90, "color": "green" }
+                        ]
+                    }
+                }
+            },
+            {
+                "title": "Average Navigation Time",
+                "type": "stat",
+                "gridPos": { "x": 6, "y": 24, "w": 6, "h": 4 },
+                "targets": [
+                    {
+                        "expr": "sum(rate(frontend_navigation_route_switch_milliseconds_sum[5m])) / sum(rate(frontend_navigation_route_switch_milliseconds_count[5m]))"
+                    }
+                ],
+                "options": {
+                    "graphMode": "area",
+                    "colorMode": "value",
+                    "unit": "ms"
+                }
+            },
+            {
+                "title": "Navigation with Data (vs No Data)",
+                "type": "piechart",
+                "gridPos": { "x": 12, "y": 24, "w": 6, "h": 8 },
+                "targets": [
+                    {
+                        "expr": "sum(rate(frontend_navigation_screen_render_milliseconds_count{hasData=\"true\"}[5m]))",
+                        "legendFormat": "With Data"
+                    },
+                    {
+                        "expr": "sum(rate(frontend_navigation_screen_render_milliseconds_count{hasData=\"false\"}[5m]))",
+                        "legendFormat": "No Data"
+                    }
+                ],
+                "options": {
+                    "pieType": "donut",
+                    "displayLabels": ["name", "percent"]
+                }
+            },
+            {
+                "title": "Route Switch Duration Distribution",
+                "type": "graph",
+                "gridPos": { "x": 18, "y": 24, "w": 6, "h": 8 },
+                "targets": [
+                    {
+                        "expr": "histogram_quantile(0.25, sum(rate(frontend_navigation_route_switch_milliseconds_bucket[5m])) by (le))",
+                        "legendFormat": "P25"
+                    },
+                    {
+                        "expr": "histogram_quantile(0.50, sum(rate(frontend_navigation_route_switch_milliseconds_bucket[5m])) by (le))",
+                        "legendFormat": "P50"
+                    },
+                    {
+                        "expr": "histogram_quantile(0.75, sum(rate(frontend_navigation_route_switch_milliseconds_bucket[5m])) by (le))",
+                        "legendFormat": "P75"
+                    },
+                    {
+                        "expr": "histogram_quantile(0.90, sum(rate(frontend_navigation_route_switch_milliseconds_bucket[5m])) by (le))",
+                        "legendFormat": "P90"
+                    },
+                    {
+                        "expr": "histogram_quantile(0.95, sum(rate(frontend_navigation_route_switch_milliseconds_bucket[5m])) by (le))",
+                        "legendFormat": "P95"
+                    },
+                    {
+                        "expr": "histogram_quantile(0.99, sum(rate(frontend_navigation_route_switch_milliseconds_bucket[5m])) by (le))",
+                        "legendFormat": "P99"
+                    }
+                ],
+                "yaxes": [
+                    {
+                        "format": "ms",
+                        "label": "Duration"
+                    }
+                ]
+            },
+            {
+                "title": "Recent Navigation Events (Table)",
+                "type": "table",
+                "gridPos": { "x": 0, "y": 32, "w": 24, "h": 8 },
+                "targets": [
+                    {
+                        "expr": "topk(20, rate(frontend_navigation_route_switch_milliseconds_count[1m]) > 0)",
+                        "format": "table",
+                        "instant": true
+                    }
+                ],
+                "options": {
+                    "showHeader": true
+                },
+                "transformations": [
+                    {
+                        "id": "organize",
+                        "options": {
+                            "excludeByName": {
+                                "Time": true,
+                                "__name__": true,
+                                "job": true,
+                                "instance": true
+                            }
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+}

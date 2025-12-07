@@ -9,8 +9,26 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as KafkaRouteImport } from './routes/kafka'
+import { Route as FileRouteImport } from './routes/file'
+import { Route as DbRouteImport } from './routes/db'
 import { Route as IndexRouteImport } from './routes/index'
 
+const KafkaRoute = KafkaRouteImport.update({
+  id: '/kafka',
+  path: '/kafka',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FileRoute = FileRouteImport.update({
+  id: '/file',
+  path: '/file',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DbRoute = DbRouteImport.update({
+  id: '/db',
+  path: '/db',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -19,28 +37,61 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/db': typeof DbRoute
+  '/file': typeof FileRoute
+  '/kafka': typeof KafkaRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/db': typeof DbRoute
+  '/file': typeof FileRoute
+  '/kafka': typeof KafkaRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/db': typeof DbRoute
+  '/file': typeof FileRoute
+  '/kafka': typeof KafkaRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/db' | '/file' | '/kafka'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/db' | '/file' | '/kafka'
+  id: '__root__' | '/' | '/db' | '/file' | '/kafka'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DbRoute: typeof DbRoute
+  FileRoute: typeof FileRoute
+  KafkaRoute: typeof KafkaRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/kafka': {
+      id: '/kafka'
+      path: '/kafka'
+      fullPath: '/kafka'
+      preLoaderRoute: typeof KafkaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/file': {
+      id: '/file'
+      path: '/file'
+      fullPath: '/file'
+      preLoaderRoute: typeof FileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/db': {
+      id: '/db'
+      path: '/db'
+      fullPath: '/db'
+      preLoaderRoute: typeof DbRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -53,6 +104,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DbRoute: DbRoute,
+  FileRoute: FileRoute,
+  KafkaRoute: KafkaRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -2,13 +2,20 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Suspense } from 'react';
 import { ErrorBoundary } from '../components/ErrorBoundary';
+import { usePageRenderMetrics } from '../hooks/usePageRenderMetrics';
 
 const BFF = import.meta.env.VITE_BFF_URL || 'http://localhost:8087';
 
 async function fetchDb() {
-    const res = await fetch(`${BFF}/db`);
-    if (!res.ok) throw new Error(`Failed to fetch db: ${res.status} ${res.statusText}`);
-    return res.json();
+    try {
+        const res = await fetch(`${BFF}/db`);
+        const data = await res.json();
+
+        if (!res.ok) throw new Error(`Failed to fetch db: ${res.status} ${res.statusText}`);
+        return data;
+    } catch (error) {
+        throw error;
+    }
 }
 
 export const Route = createFileRoute('/db')({
@@ -16,6 +23,8 @@ export const Route = createFileRoute('/db')({
 });
 
 function DbPage() {
+    usePageRenderMetrics({ pageName: 'DbPage' });
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100">
             <nav className="bg-white shadow-sm border-b">
@@ -44,10 +53,24 @@ function DbPage() {
 }
 
 function DbContent() {
+    usePageRenderMetrics({ pageName: 'DbContent' });
+
     const { data, refetch, isFetching } = useSuspenseQuery({
         queryKey: ['db'],
         queryFn: fetchDb,
     });
+
+    // const handleRefetch = useTrackedClick(
+    //     'db-refetch-button',
+    //     () => {
+    //         refetch();
+    //     },
+    //     'Refetch DB data',
+    // );
+
+    const handleRefetch = () => {
+        refetch();
+    };
 
     return (
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
@@ -58,7 +81,7 @@ function DbContent() {
                 </div>
                 <button
                     className="px-4 py-2 bg-white text-green-600 rounded-lg font-medium hover:bg-green-50 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                    onClick={() => refetch()}
+                    onClick={handleRefetch}
                     disabled={isFetching}
                 >
                     {isFetching ? (
