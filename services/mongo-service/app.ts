@@ -12,7 +12,7 @@ const app: Express = express();
 app.use(cors());
 
 // MongoDB connection setup
-const MONGO_URI = 'mongodb://mongo:27017';
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017';
 const DATABASE_NAME = 'mongo-db';
 const COLLECTION_NAME = 'mongo-service';
 

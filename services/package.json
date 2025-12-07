@@ -1,0 +1,19 @@
+{
+    "name": "backend-services",
+    "version": "1.0.0",
+    "description": "All backend services for microfrontend monitoring",
+    "scripts": {
+        "dev": "concurrently -n \"file,postgres,mongo,db,kafka,recv-a,recv-b,bff\" -c \"cyan,blue,green,yellow,magenta,red,gray,white\" \"npm run dev:file\" \"npm run dev:postgres\" \"npm run dev:mongo\" \"npm run dev:db\" \"npm run dev:kafka\" \"npm run dev:kafka-receiver-a\" \"npm run dev:kafka-receiver-b\" \"npm run dev:bff\"",
+        "dev:file": "cd file-service && npm run dev",
+        "dev:postgres": "cd postgres-service && npm run dev",
+        "dev:mongo": "cd mongo-service && npm run dev",
+        "dev:db": "cd db-service && npm run dev",
+        "dev:kafka": "cd kafka-service && npm run dev",
+        "dev:kafka-receiver-a": "cd kafka-receiver-a && npm run dev",
+        "dev:kafka-receiver-b": "cd kafka-receiver-b && npm run dev",
+        "dev:bff": "cd bff-service && npm run dev"
+    },
+    "devDependencies": {
+        "concurrently": "^9.1.2"
+    }
+}

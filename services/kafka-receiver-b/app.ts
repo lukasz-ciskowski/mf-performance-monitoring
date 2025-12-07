@@ -8,12 +8,14 @@ import { Db, MongoClient } from 'mongodb';
 const logger = logs.getLogger('kafka-receiver-b');
 
 const PORT: number = parseInt(process.env.PORT || '8086');
+const KAFKA_BROKERS = (process.env.KAFKA_BROKERS || 'localhost:29092').split(',');
+
 const app: Express = express();
 
 app.use(cors());
 
 // MongoDB connection setup
-const MONGO_URI = 'mongodb://mongo:27017';
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017';
 const DATABASE_NAME = 'mongo-db';
 const COLLECTION_NAME = 'kafka-receiver-b';
 
@@ -35,7 +37,7 @@ connect()
 
 const kafka = new Kafka({
     clientId: 'kafka-receiver-b',
-    brokers: ['kafka:9092'],
+    brokers: KAFKA_BROKERS,
 });
 const consumer = kafka.consumer({ groupId: 'test-group-b' });
 

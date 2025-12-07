@@ -12,13 +12,13 @@ export default defineConfig({
         strictPort: true,
         proxy: {
             '/file-service': {
-                target: 'http://file-service:8080',
+                target: 'http://127.0.0.1:8080',
                 changeOrigin: true,
                 secure: false,
                 rewrite: (path) => path.replace(/^\/file-service/, ''),
             },
             '/db-service': {
-                target: 'http://db-service:8083',
+                target: 'http://127.0.0.1:8083',
                 changeOrigin: true,
                 secure: false,
                 rewrite: (path) => path.replace(/^\/db-service/, ''),

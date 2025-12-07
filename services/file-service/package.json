@@ -1,6 +1,6 @@
 {
     "scripts": {
-        "dev": "tsx --import ./instrumentation.ts ./app.ts"
+        "dev": "tsx ./app.ts"
     },
     "dependencies": {
         "@opentelemetry/api": "^1.9.0",

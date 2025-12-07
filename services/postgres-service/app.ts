@@ -13,11 +13,11 @@ app.use(cors());
 
 // PostgreSQL connection setup
 const pool = new Pool({
-    user: 'user',
-    host: 'postgres',
-    database: 'postgres',
-    password: 'password',
-    port: 5432,
+    user: process.env.POSTGRES_USER || 'user',
+    host: process.env.POSTGRES_HOST || 'localhost',
+    database: process.env.POSTGRES_DB || 'postgres',
+    password: process.env.POSTGRES_PASSWORD || 'password',
+    port: parseInt(process.env.POSTGRES_PORT || '5432'),
 });
 
 app.get('/postgres', async (req, res) => {

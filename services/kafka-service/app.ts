@@ -7,13 +7,15 @@ import { Kafka } from 'kafkajs';
 const logger = logs.getLogger('kafka-service');
 
 const PORT: number = parseInt(process.env.PORT || '8084');
+const KAFKA_BROKERS = (process.env.KAFKA_BROKERS || 'localhost:29092').split(',');
+
 const app: Express = express();
 
 app.use(cors());
 
 const kafka = new Kafka({
     clientId: 'kafka-service',
-    brokers: ['kafka:9092'],
+    brokers: KAFKA_BROKERS,
 });
 const producer = kafka.producer();
 

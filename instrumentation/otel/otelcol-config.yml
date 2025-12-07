@@ -59,11 +59,6 @@ exporters:
   otlp:
     endpoint: otelcol:4317
 
-#   jaeger:
-#     endpoint: "jaeger-all-in-one:14250"
-#     tls:
-#       insecure: true
-
 processors:
   batch:
 

@@ -8,13 +8,15 @@ import { Pool } from 'pg';
 const logger = logs.getLogger('kafka-receiver-a');
 
 const PORT: number = parseInt(process.env.PORT || '8085');
+const KAFKA_BROKERS = (process.env.KAFKA_BROKERS || 'localhost:29092').split(',');
+
 const app: Express = express();
 
 app.use(cors());
 
 const kafka = new Kafka({
     clientId: 'kafka-receiver-a',
-    brokers: ['kafka:9092'],
+    brokers: KAFKA_BROKERS,
 });
 const consumer = kafka.consumer({ groupId: 'test-group-a' });
 
@@ -28,11 +30,11 @@ app.listen(PORT, async () => {
 });
 
 const pool = new Pool({
-    user: 'user',
-    host: 'postgres',
-    database: 'postgres',
-    password: 'password',
-    port: 5432,
+    user: process.env.POSTGRES_USER || 'user',
+    host: process.env.POSTGRES_HOST || 'localhost',
+    database: process.env.POSTGRES_DB || 'postgres',
+    password: process.env.POSTGRES_PASSWORD || 'password',
+    port: parseInt(process.env.POSTGRES_PORT || '5432'),
 });
 
 async function listen() {

@@ -9,7 +9,7 @@ import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc';
 
-process.env.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://otel-collector:4317';
+process.env.OTEL_EXPORTER_OTLP_ENDPOINT = process.env.OTEL_EXPORTER_OTLP_ENDPOINT || 'http://localhost:4317';
 // process.env.OTEL_LOG_LEVEL = 'debug';
 const sdk = new NodeSDK({
     resource: resourceFromAttributes({
