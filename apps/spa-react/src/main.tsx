@@ -11,6 +11,7 @@ import './styles.css';
 // import FrontendTracer from './utils/telemetry/FrontendTracer.ts';
 import './utils/telemetry/web-vitals.ts';
 import './utils/telemetry/navigation-metrics.ts';
+import './utils/telemetry/endpoint-metrics.ts';
 import { startRouteSwitch } from './utils/telemetry/navigation-metrics';
 // import { initWebVitalsMonitoring } from './utils/telemetry/webVitalsMetrics.ts';
 // import { initRUMMetrics } from './utils/telemetry/rumMetrics.ts';

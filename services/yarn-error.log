@@ -1,0 +1,52 @@
+Arguments: 
+  /Users/lukaszciskowski/.nvm/versions/node/v22.14.0/bin/node /Users/lukaszciskowski/.yarn/bin/yarn.js dev
+
+PATH: 
+  /Users/lukaszciskowski/.pyenv/shims:/shims:/Users/lukaszciskowski/.bun/bin:/Users/lukaszciskowski/.yarn/bin:/Users/lukaszciskowski/.config/yarn/global/node_modules/.bin:/Users/lukaszciskowski/.nvm/versions/node/v22.14.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/lukaszciskowski/Library/Python/3.9/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/Library/Apple/usr/bin:/usr/local/share/dotnet:~/.dotnet/tools:/Users/lukaszciskowski/Library/Application Support/Code/User/globalStorage/github.copilot-chat/debugCommand:/Users/lukaszciskowski/Library/Application Support/Code/User/globalStorage/github.copilot-chat/copilotCli:/shims:/Users/lukaszciskowski/Library/pnpm:/Users/lukaszciskowski/.deno/bin:/Users/lukaszciskowski/.bun/bin:/Users/lukaszciskowski/.yarn/bin:/Users/lukaszciskowski/.config/yarn/global/node_modules/.bin:/Users/lukaszciskowski/.nvm/versions/node/v22.14.0/bin:/Users/lukaszciskowski/.local/bin:/Users/lukaszciskowski/.dotnet/tools:/Users/lukaszciskowski/.local/bin
+
+Yarn version: 
+  1.22.19
+
+Node version: 
+  22.14.0
+
+Platform: 
+  darwin arm64
+
+Trace: 
+  SyntaxError: /Users/lukaszciskowski/Projects/magisterka/services/package.json: Expected double-quoted property name in JSON at position 710 (line 11 column 9)
+      at JSON.parse (<anonymous>)
+      at /Users/lukaszciskowski/.yarn/lib/cli.js:1629:59
+      at Generator.next (<anonymous>)
+      at step (/Users/lukaszciskowski/.yarn/lib/cli.js:310:30)
+      at /Users/lukaszciskowski/.yarn/lib/cli.js:321:13
+
+npm manifest: 
+  {
+      "name": "backend-services",
+      "version": "1.0.0",
+      "description": "All backend services for microfrontend monitoring",
+      "scripts": {
+          "dev": "concurrently -n \"file,postgres,mongo,db,kafka,recv-a,recv-b,bff\" -c \"cyan,blue,green,yellow,magenta,red,gray,white\" \"npm run dev:file\" \"npm run dev:postgres\" \"npm run dev:mongo\" \"npm run dev:db\" \"npm run dev:kafka\" \"npm run dev:kafka-receiver-a\" \"npm run dev:kafka-receiver-b\" \"npm run dev:bff\"",
+          "dev:file": "cd file-service && npm run dev",
+          "dev:postgres": "cd postgres-service && npm run dev",
+          "dev:mongo": "cd mongo-service && npm run dev",
+          "dev:db": "cd db-service && npm run dev",
+          // "dev:kafka": "cd kafka-service && npm run dev",
+          "dev:kafka": "cd kafka-service ",
+          // "dev:kafka-receiver-a": "cd kafka-receiver-a && npm run dev",
+          "dev:kafka-receiver-a": "cd kafka-receiver-a",
+          //"dev:kafka-receiver-b": "cd kafka-receiver-b && npm run dev",
+          "dev:kafka-receiver-b": "cd kafka-receiver-b",
+          "dev:bff": "cd bff-service && npm run dev"
+      },
+      "devDependencies": {
+          "concurrently": "^9.1.2"
+      }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile

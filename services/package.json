@@ -8,9 +8,9 @@
         "dev:postgres": "cd postgres-service && npm run dev",
         "dev:mongo": "cd mongo-service && npm run dev",
         "dev:db": "cd db-service && npm run dev",
-        "dev:kafka": "cd kafka-service && npm run dev",
-        "dev:kafka-receiver-a": "cd kafka-receiver-a && npm run dev",
-        "dev:kafka-receiver-b": "cd kafka-receiver-b && npm run dev",
+        "dev:kafka": "cd kafka-service ",
+        "dev:kafka-receiver-a": "cd kafka-receiver-a",
+        "dev:kafka-receiver-b": "cd kafka-receiver-b",
         "dev:bff": "cd bff-service && npm run dev"
     },
     "devDependencies": {

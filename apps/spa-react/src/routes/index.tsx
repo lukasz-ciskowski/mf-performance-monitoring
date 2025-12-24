@@ -13,14 +13,14 @@ function App() {
             <header className="min-h-screen flex flex-col items-center justify-center text-white gap-8 px-4">
                 <div className="text-center">
                     <h1 className="text-5xl font-bold mb-3 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                        Microfrontend Monitoring
+                        Frontend Monitoring
                     </h1>
-                    <p className="text-xl text-gray-300">Interactive BFF Demo</p>
                 </div>
 
                 <nav className="flex flex-col sm:flex-row gap-4 mt-8">
                     <Link
                         to="/file"
+                        preload={false}
                         className="group relative px-8 py-4 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl text-white font-semibold shadow-lg hover:shadow-blue-500/50 transition-all hover:scale-105"
                     >
                         <div className="flex items-center gap-3">
@@ -34,6 +34,7 @@ function App() {
 
                     <Link
                         to="/db"
+                        preload={false}
                         className="group relative px-8 py-4 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl text-white font-semibold shadow-lg hover:shadow-green-500/50 transition-all hover:scale-105"
                     >
                         <div className="flex items-center gap-3">
@@ -47,6 +48,7 @@ function App() {
 
                     <Link
                         to="/kafka"
+                        preload={false}
                         className="group relative px-8 py-4 bg-gradient-to-r from-purple-500 to-violet-600 rounded-xl text-white font-semibold shadow-lg hover:shadow-purple-500/50 transition-all hover:scale-105"
                     >
                         <div className="flex items-center gap-3">

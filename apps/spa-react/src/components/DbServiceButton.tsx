@@ -1,10 +1,11 @@
 import { useState } from 'react';
+import { trackedFetch } from '../utils/telemetry/endpoint-metrics';
 
 const DbServiceButton = () => {
     const [response, setResponse] = useState<string | null>(null);
     const handleClick = async () => {
         setResponse(null);
-        const response = await fetch('/db-service/db');
+        const response = await trackedFetch('/db-service/db');
         const data = await response.json();
         setResponse(JSON.stringify(data, null, 2));
         // const singleSpan = provider.startSpan('db-multi-service-request');

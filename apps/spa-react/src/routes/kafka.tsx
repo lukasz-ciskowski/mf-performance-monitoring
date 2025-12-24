@@ -3,12 +3,13 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { Suspense } from 'react';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import { usePageRenderMetrics } from '../hooks/usePageRenderMetrics';
+import { trackedFetch } from '../utils/telemetry/endpoint-metrics';
 
 const BFF = import.meta.env.VITE_BFF_URL || 'http://localhost:8087';
 
 async function fetchKafka() {
     try {
-        const res = await fetch(`${BFF}/kafka`);
+        const res = await trackedFetch(`${BFF}/kafka`);
         const data = await res.json();
 
         if (!res.ok) throw new Error(`Failed to fetch kafka: ${res.status} ${res.statusText}`);
@@ -29,7 +30,7 @@ function KafkaPage() {
         <div className="min-h-screen bg-gradient-to-br from-purple-50 to-violet-100">
             <nav className="bg-white shadow-sm border-b">
                 <div className="max-w-7xl mx-auto px-4 py-4">
-                    <Link to="/" className="text-purple-600 hover:text-purple-800 font-medium">
+                    <Link to="/" preload={false} className="text-purple-600 hover:text-purple-800 font-medium">
                         ← Back to Home
                     </Link>
                 </div>

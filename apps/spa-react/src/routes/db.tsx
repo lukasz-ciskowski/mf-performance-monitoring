@@ -3,12 +3,14 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { Suspense } from 'react';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import { usePageRenderMetrics } from '../hooks/usePageRenderMetrics';
+import { trackedFetch } from '@/utils/telemetry/endpoint-metrics';
+import { queryClient } from '@/main';
 
 const BFF = import.meta.env.VITE_BFF_URL || 'http://localhost:8087';
 
 async function fetchDb() {
     try {
-        const res = await fetch(`${BFF}/db`);
+        const res = await trackedFetch(`${BFF}/db`);
         const data = await res.json();
 
         if (!res.ok) throw new Error(`Failed to fetch db: ${res.status} ${res.statusText}`);
@@ -20,6 +22,12 @@ async function fetchDb() {
 
 export const Route = createFileRoute('/db')({
     component: DbPage,
+    loader: async () => {
+        await queryClient.ensureQueryData({
+            queryKey: ['db'],
+            queryFn: fetchDb,
+        });
+    },
 });
 
 function DbPage() {
@@ -29,7 +37,7 @@ function DbPage() {
         <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100">
             <nav className="bg-white shadow-sm border-b">
                 <div className="max-w-7xl mx-auto px-4 py-4">
-                    <Link to="/" className="text-green-600 hover:text-green-800 font-medium">
+                    <Link to="/" preload={false} className="text-green-600 hover:text-green-800 font-medium">
                         ← Back to Home
                     </Link>
                 </div>
@@ -80,6 +88,7 @@ function DbContent() {
                     <p className="text-green-100 text-sm">BFF → db-service → mongo-service + postgres-service</p>
                 </div>
                 <button
+                    id="rerun-button"
                     className="px-4 py-2 bg-white text-green-600 rounded-lg font-medium hover:bg-green-50 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                     onClick={handleRefetch}
                     disabled={isFetching}

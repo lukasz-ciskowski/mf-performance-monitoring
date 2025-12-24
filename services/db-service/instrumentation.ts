@@ -15,7 +15,7 @@ const sdk = new NodeSDK({
     resource: resourceFromAttributes({
         [ATTR_SERVICE_NAME]: 'db-service',
         [ATTR_SERVICE_VERSION]: process.env.SERVICE_VERSION || '1.0.0',
-        'service.namespace': 'microfrontend-backend',
+        'service.namespace': 'db-service',
         'service.instance.id': process.env.HOSTNAME || 'localhost',
     }),
     traceExporter: new OTLPTraceExporter({}),

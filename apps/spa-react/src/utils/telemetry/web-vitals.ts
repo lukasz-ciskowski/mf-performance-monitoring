@@ -105,37 +105,22 @@ export function initWebVitalsMonitoring() {
 
         ttfbHistogram = meter.createHistogram('frontend.web_vitals.ttfb_milliseconds', {
             description: 'Time to First Byte (TTFB) in milliseconds',
-            advice: {
-                explicitBucketBoundaries: HISTOGRAM_BOUNDARIES.ttfb_ms,
-            },
         });
 
         fcpHistogram = meter.createHistogram('frontend.web_vitals.fcp_milliseconds', {
             description: 'First Contentful Paint (FCP) in milliseconds',
-            advice: {
-                explicitBucketBoundaries: HISTOGRAM_BOUNDARIES.paint_ms,
-            },
         });
 
         lcpHistogram = meter.createHistogram('frontend.web_vitals.lcp_milliseconds', {
             description: 'Largest Contentful Paint (LCP) in milliseconds',
-            advice: {
-                explicitBucketBoundaries: HISTOGRAM_BOUNDARIES.paint_ms,
-            },
         });
 
         clsHistogram = meter.createHistogram('frontend.web_vitals.cls_score', {
             description: 'Cumulative Layout Shift (CLS) score',
-            advice: {
-                explicitBucketBoundaries: HISTOGRAM_BOUNDARIES.cls,
-            },
         });
 
         inpHistogram = meter.createHistogram('frontend.web_vitals.inp_milliseconds', {
             description: 'Interaction to Next Paint (INP) in milliseconds',
-            advice: {
-                explicitBucketBoundaries: HISTOGRAM_BOUNDARIES.paint_ms,
-            },
         });
 
         onTTFB(sendToOTel, { reportAllChanges: false });
@@ -173,6 +158,7 @@ export function initWebVitalsMonitoring() {
                         ...data.attributes,
                         replay: 'true', // Mark as replayed value
                     });
+                    lastMetricValues.delete(metricName);
                 }
             });
         }, 5000); // Match the export interval

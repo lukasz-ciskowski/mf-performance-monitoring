@@ -1,11 +1,12 @@
 import { useState } from 'react';
+import { trackedFetch } from '../utils/telemetry/endpoint-metrics';
 
 const FileServiceButton = () => {
     const [response, setResponse] = useState<string | null>(null);
     const handleClick = async () => {
         setResponse(null);
 
-        const response = await fetch('/file-service/file');
+        const response = await trackedFetch('/file-service/file');
         const data = await response.json();
         setResponse(JSON.stringify(data, null, 2));
 

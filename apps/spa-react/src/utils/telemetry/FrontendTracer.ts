@@ -48,7 +48,7 @@ const FrontendTracer = () => {
     // Set up Meter Provider for metrics
     const metricExporter = new OTLPMetricExporter({
         url: 'http://localhost:4318/v1/metrics', // OTEL Collector HTTP endpoint
-        temporalityPreference: AggregationTemporality.DELTA, // Delta for Prometheus compatibility
+        temporalityPreference: AggregationTemporality.DELTA,
     });
 
     const meterProvider = new MeterProvider({
@@ -56,8 +56,8 @@ const FrontendTracer = () => {
         readers: [
             new PeriodicExportingMetricReader({
                 exporter: metricExporter,
-                exportIntervalMillis: 5000, // Export every 5 seconds
-                exportTimeoutMillis: 1000,
+                exportIntervalMillis: 1000,
+                exportTimeoutMillis: 500,
             }),
         ],
     });
