@@ -23,7 +23,24 @@ const sdk = new NodeSDK({
         exporter: new OTLPMetricExporter(),
     }),
     logRecordProcessor: new SimpleLogRecordProcessor(new OTLPLogExporter()),
-    instrumentations: [getNodeAutoInstrumentations()],
+    instrumentations: [
+        getNodeAutoInstrumentations({
+            '@opentelemetry/instrumentation-dns': {
+                enabled: false,
+            },
+            '@opentelemetry/instrumentation-net': {
+                enabled: false,
+            },
+            '@opentelemetry/instrumentation-express': {
+                ignoreLayersType: ['middleware' as any],
+            },
+            '@opentelemetry/instrumentation-http': {
+                ignoreIncomingRequestHook: (request: any) => {
+                    return request.method === 'OPTIONS';
+                },
+            },
+        }),
+    ],
 });
 
 sdk.start();

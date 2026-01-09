@@ -31,6 +31,25 @@ const sdk = new NodeSDK({
             '@opentelemetry/instrumentation-net': {
                 enabled: false,
             },
+            '@opentelemetry/instrumentation-express': {
+                ignoreLayersType: ['middleware' as any],
+            },
+            '@opentelemetry/instrumentation-http': {
+                ignoreIncomingRequestHook: (request: any) => {
+                    // Ignore OPTIONS requests (CORS preflight)
+                    return request.method === 'OPTIONS';
+                },
+                applyCustomAttributesOnSpan: (span: any, request: any, response: any) => {
+                    // Extract service name from URL
+                    const url = request?.path || '';
+
+                    if (url.includes('/postgres')) {
+                        span.setAttribute('peer.service', 'postgres-service');
+                    } else if (url.includes('/mongo')) {
+                        span.setAttribute('peer.service', 'mongo-service');
+                    }
+                },
+            },
         }),
     ],
 });

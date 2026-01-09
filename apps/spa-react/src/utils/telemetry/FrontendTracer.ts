@@ -56,8 +56,8 @@ const FrontendTracer = () => {
         readers: [
             new PeriodicExportingMetricReader({
                 exporter: metricExporter,
-                exportIntervalMillis: 1000,
-                exportTimeoutMillis: 500,
+                exportIntervalMillis: 5000,
+                exportTimeoutMillis: 1000,
             }),
         ],
     });
@@ -89,12 +89,12 @@ const FrontendTracer = () => {
                 propagateTraceHeaderCorsUrls: [
                     /.+/g, // Regex to match your backend URLs
                 ],
-                applyCustomAttributesOnSpan: (span, _request, response) => {
-                    if (response instanceof Response) {
-                        const url = response.url;
-                        const service = url.split('/')[3]; // Extract the service name from the URL
-                        span.setAttribute('peer.service', service);
-                    }
+                ignoreUrls: [],
+                clearTimingResources: true,
+                applyCustomAttributesOnSpan: (span, request, response) => {
+                    // Frontend always communicates through BFF service
+                    span.setAttribute('peer.service', 'bff-service');
+                    span.setAttribute('service.name', SERVICE_NAME);
                 },
             }),
             // new DocumentLoadInstrumentation(),

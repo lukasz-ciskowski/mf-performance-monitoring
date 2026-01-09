@@ -12,7 +12,14 @@ receivers:
 
 connectors:
   servicegraph:
-    virtual_node_extra_label: true
+    virtual_node_extra_label: false
+    virtual_node_peer_attributes:
+      - peer.service
+      - client.service
+    dimensions:
+      - http.route
+      - http.target
+      - http.method
   spanmetrics:
     histogram:
       explicit:

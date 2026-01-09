@@ -28,6 +28,20 @@ const sdk = new NodeSDK({
             '@opentelemetry/instrumentation-net': {
                 enabled: false,
             },
+            '@opentelemetry/instrumentation-express': {
+                ignoreLayersType: ['middleware' as any],
+            },
+            '@opentelemetry/instrumentation-http': {
+                ignoreIncomingRequestHook: (request: any) => {
+                    return request.method === 'OPTIONS';
+                },
+            },
+            '@opentelemetry/instrumentation-mongodb': {
+                enhancedDatabaseReporting: true,
+                responseHook: (span: any, responseInfo: any) => {
+                    span.setAttribute('peer.service', 'mongo-db');
+                },
+            },
         }),
     ],
 });

@@ -32,6 +32,11 @@ services:
         environment:
             - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
             - MONGO_URI=mongodb://mongo:27017
+            # Chaos engineering - simulate database problems
+            - SIMULATE_MONGO_ERRORS=true
+            - MONGO_ERROR_RATE=0.2 # 20% of requests fail
+            - MONGO_SLOW_QUERY_RATE=0.3 # 30% of requests are slow
+            - MONGO_SLOW_QUERY_DELAY_MS=3000 # 3 seconds delay for slow queries
         restart: always
 
     db-service:

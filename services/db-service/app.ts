@@ -23,19 +23,19 @@ app.get('/db', async (req, res) => {
     try {
         logger.emit({
             severityNumber: SeverityNumber.INFO,
-            body: 'Starting to read from MongoDB',
-        });
-
-        const mongoContent = await fetch(`${MONGO_SERVICE_URL}/mongo`);
-        const mongoResponse = await mongoContent.json();
-
-        logger.emit({
-            severityNumber: SeverityNumber.INFO,
             body: 'Starting to read from PostgreSQL',
         });
 
         const postgresContent = await fetch(`${POSTGRES_SERVICE_URL}/postgres`);
         const postgresResponse = await postgresContent.json();
+
+        logger.emit({
+            severityNumber: SeverityNumber.INFO,
+            body: 'Starting to read from MongoDB',
+        });
+
+        const mongoContent = await fetch(`${MONGO_SERVICE_URL}/mongo`);
+        const mongoResponse = await mongoContent.json();
 
         res.json({
             status: 200,
@@ -49,6 +49,7 @@ app.get('/db', async (req, res) => {
             severityNumber: SeverityNumber.ERROR,
             body: `Error reading from databases: ${(error as Error).message}`,
         });
+        throw error;
     }
 });
 

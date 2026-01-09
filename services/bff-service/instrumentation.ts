@@ -31,6 +31,26 @@ const sdk = new NodeSDK({
             '@opentelemetry/instrumentation-net': {
                 enabled: false,
             },
+            '@opentelemetry/instrumentation-express': {
+                ignoreLayersType: ['middleware' as any],
+            },
+            '@opentelemetry/instrumentation-http': {
+                ignoreIncomingRequestHook: (request: any) => {
+                    // Ignore OPTIONS requests (CORS preflight)
+                    return request.method === 'OPTIONS';
+                },
+                applyCustomAttributesOnSpan: (span: any, request: any, response: any) => {
+                    // Extract service name from URL
+                    const url = request?.path || '';
+
+                    span.setAttribute('client.service', 'spa-react');
+                    if (url.includes('/db')) {
+                        span.setAttribute('peer.service', 'db-service');
+                    } else if (url.includes('/file')) {
+                        span.setAttribute('peer.service', 'file-service');
+                    }
+                },
+            },
         }),
     ],
 });

@@ -143,7 +143,7 @@ services:
             - prometheus
 
     grafana:
-        image: grafana/grafana:12.0.1
+        image: grafana/grafana:latest
         ports:
             - "3000:3000"
         volumes:
