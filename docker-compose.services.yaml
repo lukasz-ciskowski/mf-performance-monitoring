@@ -55,40 +55,40 @@ services:
             - KAFKA_SERVICE_URL=http://kafka-service:8084
         restart: always
 
-    kafka-service:
-        build:
-            context: ./services/kafka-service
-            dockerfile: Dockerfile
-        ports:
-            - "8084:8084"
-        environment:
-            - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
-            - KAFKA_BROKERS=kafka:9092
-        restart: always
+    # kafka-service:
+    #     build:
+    #         context: ./services/kafka-service
+    #         dockerfile: Dockerfile
+    #     ports:
+    #         - "8084:8084"
+    #     environment:
+    #         - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+    #         - KAFKA_BROKERS=kafka:9092
+    #     restart: always
 
-    kafka-receiver-a:
-        build:
-            context: ./services/kafka-receiver-a
-            dockerfile: Dockerfile
-        ports:
-            - "8085:8085"
-        environment:
-            - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
-            - KAFKA_BROKERS=kafka:9092
-            - POSTGRES_HOST=postgres
-        restart: always
+    # kafka-receiver-a:
+    #     build:
+    #         context: ./services/kafka-receiver-a
+    #         dockerfile: Dockerfile
+    #     ports:
+    #         - "8085:8085"
+    #     environment:
+    #         - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+    #         - KAFKA_BROKERS=kafka:9092
+    #         - POSTGRES_HOST=postgres
+    #     restart: always
 
-    kafka-receiver-b:
-        build:
-            context: ./services/kafka-receiver-b
-            dockerfile: Dockerfile
-        ports:
-            - "8086:8086"
-        environment:
-            - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
-            - KAFKA_BROKERS=kafka:9092
-            - MONGO_URI=mongodb://mongo:27017
-        restart: always
+    # kafka-receiver-b:
+    #     build:
+    #         context: ./services/kafka-receiver-b
+    #         dockerfile: Dockerfile
+    #     ports:
+    #         - "8086:8086"
+    #     environment:
+    #         - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+    #         - KAFKA_BROKERS=kafka:9092
+    #         - MONGO_URI=mongodb://mongo:27017
+    #     restart: always
 
     bff-service:
         build:
@@ -99,7 +99,6 @@ services:
         depends_on:
             - file-service
             - db-service
-            - kafka-service
         environment:
             - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
             - FILE_SERVICE_URL=http://file-service:8080
