@@ -1,0 +1,427 @@
+{
+    "annotations": {
+        "list": [
+            {
+                "builtIn": 1,
+                "datasource": {
+                    "type": "grafana",
+                    "uid": "-- Grafana --"
+                },
+                "enable": true,
+                "hide": true,
+                "iconColor": "rgba(0, 211, 255, 1)",
+                "name": "Annotations & Alerts",
+                "type": "dashboard"
+            }
+        ]
+    },
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 0,
+    "id": 0,
+    "links": [],
+    "panels": [
+        {
+            "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "custom": {
+                        "align": "auto",
+                        "cellOptions": {
+                            "type": "auto"
+                        },
+                        "footer": {
+                            "reducers": []
+                        },
+                        "inspect": false
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": 0
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 0,
+                "y": 0
+            },
+            "id": 4,
+            "options": {
+                "cellHeight": "sm",
+                "frameIndex": 1,
+                "showHeader": true
+            },
+            "pluginVersion": "12.3.2",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "prometheus"
+                    },
+                    "editorMode": "code",
+                    "expr": "(round(sum(rate(traces_service_graph_request_total[$__rate_interval])) / sum(rate(traces_service_graph_request_total{client=\"spa-react\"}[$__rate_interval]))))",
+                    "format": "table",
+                    "hide": false,
+                    "legendFormat": "__auto",
+                    "range": true,
+                    "refId": "A"
+                }
+            ],
+            "title": "Frontend trace sizes",
+            "transformations": [
+                {
+                    "id": "filterByValue",
+                    "options": {
+                        "filters": [
+                            {
+                                "config": {
+                                    "id": "greaterOrEqual",
+                                    "options": {
+                                        "value": 0
+                                    }
+                                },
+                                "fieldName": "Value"
+                            }
+                        ],
+                        "match": "any",
+                        "type": "include"
+                    }
+                },
+                {
+                    "id": "groupBy",
+                    "options": {
+                        "fields": {
+                            "Value": {
+                                "aggregations": [],
+                                "operation": "groupby"
+                            }
+                        }
+                    }
+                }
+            ],
+            "type": "table"
+        },
+        {
+            "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "custom": {
+                        "align": "auto",
+                        "cellOptions": {
+                            "type": "auto"
+                        },
+                        "footer": {
+                            "reducers": []
+                        },
+                        "inspect": false
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": 0
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 12,
+                "y": 0
+            },
+            "id": 3,
+            "options": {
+                "cellHeight": "sm",
+                "showHeader": true
+            },
+            "pluginVersion": "12.3.2",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "prometheus"
+                    },
+                    "disableTextWrap": false,
+                    "editorMode": "code",
+                    "expr": "sum by (service_name) (\n  label_replace(\n    rate(traces_service_graph_request_total[$__rate_interval]), \n    \"service_name\", \"$1\", \"client\", \"(.*)\"\n  )\n)\n/\nsum by (service_name) (\n  label_replace(\n    rate(traces_service_graph_request_total[$__rate_interval]), \n    \"service_name\", \"$1\", \"server\", \"(.*)\"\n  )\n)",
+                    "format": "table",
+                    "fullMetaSearch": false,
+                    "includeNullMetadata": true,
+                    "instant": false,
+                    "legendFormat": "__auto",
+                    "range": true,
+                    "refId": "A",
+                    "useBackend": false
+                }
+            ],
+            "title": "Fan out",
+            "transformations": [
+                {
+                    "id": "filterByValue",
+                    "options": {
+                        "filters": [
+                            {
+                                "config": {
+                                    "id": "greaterOrEqual",
+                                    "options": {
+                                        "value": 0
+                                    }
+                                },
+                                "fieldName": "Value"
+                            },
+                            {
+                                "config": {
+                                    "id": "lower",
+                                    "options": {
+                                        "value": "1000000"
+                                    }
+                                },
+                                "fieldName": "Value"
+                            }
+                        ],
+                        "match": "all",
+                        "type": "include"
+                    }
+                },
+                {
+                    "id": "groupBy",
+                    "options": {
+                        "fields": {
+                            "Value": {
+                                "aggregations": ["max"],
+                                "operation": "aggregate"
+                            },
+                            "service_name": {
+                                "aggregations": [],
+                                "operation": "groupby"
+                            }
+                        }
+                    }
+                }
+            ],
+            "type": "table"
+        },
+        {
+            "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "custom": {
+                        "align": "auto",
+                        "cellOptions": {
+                            "type": "auto"
+                        },
+                        "footer": {
+                            "reducers": []
+                        },
+                        "inspect": false
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": 0
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 0,
+                "y": 8
+            },
+            "id": 2,
+            "options": {
+                "cellHeight": "sm",
+                "showHeader": true
+            },
+            "pluginVersion": "12.3.2",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "prometheus"
+                    },
+                    "disableTextWrap": false,
+                    "editorMode": "builder",
+                    "expr": "count by(client) (sum by(client, server) (rate(traces_service_graph_request_total{server!=\"unknown\"}[$__rate_interval]))) > 0",
+                    "format": "table",
+                    "fullMetaSearch": false,
+                    "includeNullMetadata": true,
+                    "instant": false,
+                    "legendFormat": "__auto",
+                    "range": true,
+                    "refId": "A",
+                    "useBackend": false
+                }
+            ],
+            "title": "Service dependency degree",
+            "transformations": [
+                {
+                    "id": "groupBy",
+                    "options": {
+                        "fields": {
+                            "Time": {
+                                "aggregations": []
+                            },
+                            "Value": {
+                                "aggregations": ["max"],
+                                "operation": "aggregate"
+                            },
+                            "client": {
+                                "aggregations": [],
+                                "operation": "groupby"
+                            }
+                        }
+                    }
+                }
+            ],
+            "type": "table"
+        },
+        {
+            "datasource": {
+                "type": "tempo",
+                "uid": "P8D6546721A1D106C"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "custom": {
+                        "align": "auto",
+                        "cellOptions": {
+                            "type": "auto"
+                        },
+                        "footer": {
+                            "reducers": []
+                        },
+                        "inspect": false
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": 0
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 12,
+                "w": 12,
+                "x": 12,
+                "y": 8
+            },
+            "id": 1,
+            "options": {
+                "cellHeight": "sm",
+                "showHeader": true
+            },
+            "pluginVersion": "12.3.2",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "tempo",
+                        "uid": "P8D6546721A1D106C"
+                    },
+                    "hide": false,
+                    "limit": 20,
+                    "metricsQueryType": "range",
+                    "query": "{resource.service.name=\"spa-react\"}",
+                    "queryType": "traceql",
+                    "refId": "A",
+                    "serviceMapUseNativeHistograms": false,
+                    "tableType": "traces"
+                }
+            ],
+            "title": "SPA app traces",
+            "transformations": [
+                {
+                    "id": "sortBy",
+                    "options": {
+                        "fields": {},
+                        "sort": [
+                            {
+                                "desc": true,
+                                "field": "Duration"
+                            }
+                        ]
+                    }
+                }
+            ],
+            "type": "table"
+        }
+    ],
+    "preload": false,
+    "schemaVersion": 42,
+    "tags": [],
+    "templating": {
+        "list": []
+    },
+    "time": {
+        "from": "now-6h",
+        "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "browser",
+    "title": "Traces",
+    "uid": "394ea264-2501-408f-8895-59fc4bba6965",
+    "version": 12
+}

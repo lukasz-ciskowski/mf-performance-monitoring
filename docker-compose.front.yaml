@@ -1,0 +1,11 @@
+version: "3.8"
+
+services:
+    # Frontends
+    spa-react:
+        build:
+            context: ./apps/spa-react
+            dockerfile: Dockerfile
+        ports:
+        - "3001:3001"
+        restart: always

@@ -118,6 +118,7 @@ services:
 
     prometheus:
         image: prom/prometheus:v3.4.1
+        user: "0"  # run as root so /prometheus is writable (avoids "unable to create mmap-ed active query log")
         volumes:
             - "./instrumentation/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"
             - "./tmp/prometheus/data:/prometheus"
